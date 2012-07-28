@@ -15,6 +15,7 @@
 		<spring.security.version>3.0.2.RELEASE</spring.security.version>
 		<org.hibernate.version>3.5.6-Final</org.hibernate.version>
 		<struts.version>2.2.3.1</struts.version>
+		<log4j.version>1.2.14</log4j.version>
 	</properties>
 
 	<dependencies>
@@ -44,7 +45,6 @@
 			<version>1.0.3</version>
 		</dependency>
 		 -->
-
 		
 		<!-- Jakarta Commons -->
 
@@ -236,6 +236,14 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>4.2.0.Final</version>
 		</dependency>
+		
+		<!-- Envers for Audit -->
+		
+		<dependency>
+   			<groupId>org.hibernate</groupId>
+   			<artifactId>hibernate-envers</artifactId>
+   			<version>3.5.0-Beta-3</version>
+		</dependency>
 
 
 		<!-- Hibernate - Javax Persistance -->
@@ -272,6 +280,8 @@
 			<artifactId>lucene-snowball</artifactId>
 			<version>2.4.0</version>
 		</dependency>
+		
+		
 
 		<!-- quartz -->
 
@@ -297,6 +307,13 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.5.6</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		
 		
 
 		<!-- Struts 2 -->

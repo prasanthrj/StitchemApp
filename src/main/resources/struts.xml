@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC 
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+
+	<!-- Constants (alternate for struts.properties) -->
+	
+	<!-- action extension .. for example "action" -->
+<!-- 	<constant name="struts.action.extension" value="" /> -->
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
+	
+	<!-- Object Factory -->
+	<constant name="struts.objectFactory" value="spring" />
+
+	<!-- Packages -->
+	
+	
+	<!-- Root  -->
+	
+	<package name="root" namespace="/" extends="json-default">
+	
+		<result-types>
+			<result-type name="json" class="org.apache.struts2.json.JSONResult">
+				<param name="ignoreHierarchy">false</param>
+			</result-type>
+		</result-types>
+		
+		<!-- Interceptors -->
+		
+		 <interceptors>
+            <interceptor-stack name="afDefaultStack">
+                <interceptor-ref name="defaultStack">
+                    <param name="exception.logEnabled">true</param>
+                    <param name="exception.logLevel">ERROR</param>
+                </interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+        <default-interceptor-ref name="afDefaultStack" />
+        
+	   
+	   <!-- Global Error -->
+	   
+	    <global-results>
+            <result name="runtime">/pages/error.jsp</result>
+        </global-results>
+       
+        <global-exception-mappings>
+            <exception-mapping result="runtime" exception="java.lang.RuntimeException" />
+            <exception-mapping result="runtime" exception="com.stitchemapp.exceptions.GenericException"/>
+            <exception-mapping result="runtime" exception="java.lang.Exception"/>
+        </global-exception-mappings>
+       
+       
+       
+		
+		
+
+		<!-- Actions -->
+		
+		<action name="">
+			<result>/index.jsp</result>
+		</action>
+		
+		<action name="home" class="homeAction" method="prepareHome">
+			<result name="success">/pages/home.jsp</result>
+		</action>
+		
+		<action name="signin" class="homeAction" method="execute">
+			<result name="success">/pages/sign_in.jsp</result>
+		</action>
+		
+		<action name="signup" class="homeAction" method="prepareSignUp">
+			<result name="success">/pages/sign_up.jsp</result>
+			<result name="none" type="chain">
+	            <param name="actionName">home</param>
+	            <param name="namespace">/user</param>
+	        </result>
+		</action>
+		
+		
+	</package>
+	
+	
+	
+	<!-- static pages related  -->
+	
+	<package name="static" namespace="/static" extends="json-default">
+		
+		<action name="about" class="homeAction" method="prepareStaticPage">
+			<result name="success">/pages/static/about_us.jsp</result>
+		</action>
+		
+		<action name="contact" class="homeAction" method="prepareStaticPage">
+			<result name="success">/pages/static/contact_us.jsp</result>
+		</action>
+		
+		<action name="home" class="homeAction" method="prepareStaticPage">
+			<result name="success">/pages/home.jsp</result>
+		</action>
+		
+	</package>
+	
+	
+	<!-- User Account related  -->
+	
+	<package name="account" namespace="/user" extends="json-default">
+		
+		<action name="register" class="userAction" method="registerUser">
+			<result type="chain" name="success">
+	            <param name="actionName">home</param>
+	        </result>
+		</action>
+		
+		<action name="home" class="userAccountAction" method="prepareUserHome">
+			<result name="success">/pages/account/user_home.jsp</result>
+		</action>
+		
+		<action name="profile" class="userAccountAction" method="prepareUserProfile">
+			<result name="success">/pages/account/user_profile.jsp</result>
+		</action>
+	
+	</package>
+	
+	
+	
+	<!-- Project related  -->
+	
+	<package name="project" namespace="/project" extends="json-default">
+		
+		<action name="info" class="projectAction" method="prepareProjectInfo">
+			<result name="success" type="json">
+				<param name="includeProperties"> projectBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, projectBean.*\.appUser, projectBean.*\.page
+                </param>
+			</result>
+		</action>
+		
+		<action name="view" class="projectAction" method="prepareProjectView">
+			<result name="success">/pages/project/project_view.jsp</result>
+		</action>
+		
+		<action name="edit" class="projectAction" method="prepareProjectForEdit">
+			<result name="success">/pages/project/project_create_edit.jsp</result>
+		</action>
+		
+		<action name="create" class="projectAction" method="prepareProjectForEdit">
+			<result name="success">/pages/project/project_create_edit.jsp</result>
+		</action>
+		
+		<action name="save" class="projectAction" method="saveProject">
+			
+			<result name="success" type="redirectAction">
+				<param name="actionName">prepare</param>
+				<param name="namespace">/project/build</param>
+				
+                <param name="project.pkey">${project.pkey}</param>
+                <param name="user.emailId">${user.emailId}</param>
+				
+			</result>
+			
+			<result name="input" type="redirectAction">
+				<param name="actionName">home</param>
+				<param name="namespace">/</param>
+			</result>
+			
+		</action>
+		
+		<action name="delete" class="projectAction" method="deleteProject">
+<!-- 			<result name="success">/pages/account/user_home.jsp</result> -->
+			<result type="chain" name="success">
+	            <param name="actionName">home</param>
+	            <param name="namespace">/user</param>
+	        </result>
+		</action>
+		
+		<action name="fetch_projects" class="homeAction" method="fetchPublicProjects">
+			<result name="success" type="json">
+				<param name="includeProperties"> projects.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, project.*\.project,  project.*\.imageFiles, project.*\.pages, project.*\.tags, project.*\.appUsers
+                </param>
+			</result>
+		</action>
+		
+		<action name="fetch_tags" class="contentAction" method="prepareTagsList">
+			<result name="success" type="json">
+				<param name="includeProperties"> tag.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, tags.*\.relevantTags
+                </param>
+			</result>
+		</action>
+		
+		
+
+	</package>
+	
+	
+	<!-- Project Builder related  -->
+	
+	<package name="projectBuilder" namespace="/project/build" extends="json-default">
+	
+		<action name="prepare" class="screenBuilderAction" method="prepareProjectForBuild">
+			<result name="success">/pages/project/project_build.jsp</result>
+		</action>
+		
+		<action name="upload_image" class="screenBuilderAction" method="uploadProjectImage">
+			<result name="success" type="json">
+				<param name="includeProperties"> page.*, imageFile.*, </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, imageFiles.*, page.*\.layout, page.*\.project, imageFile.*\.project
+                </param>
+			</result>
+		</action>
+		
+		<action name="upload_images" class="screenBuilderAction" method="uploadProjectImages">
+			<result name="success" type="json">
+				<param name="includeProperties"> imageFiles.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, imageFiles.*\.project, 
+                </param>
+			</result>
+		</action>
+		
+		<action name="update_image" class="screenBuilderAction" method="updateProjectScreenImage">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, page.*, </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, imageFiles.*, page.*\.layout, page.*\.project, imageFile.*\.project
+                </param>
+			</result>
+		</action>
+		
+		
+		
+		<!-- LayOut Related -->
+		
+		<action name="update_landing_page" class="screenBuilderAction" method="updateProjectLandingPage">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, page.*\.pkey, page.*\.title </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, pages.*, page.*\.project, page.*\.layout, page.*\.hotSpot, page.*\.hotSpots, page.*\.comments, 
+                </param>
+			</result>
+		</action>
+		
+		
+		
+		<!-- Page Related -->
+		
+		<action name="save_page" class="screenBuilderAction" method="savePage">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, page.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, pages.*, page.*\.layout, page.*\.hotSpot, page.*\.hotSpots, page.*\.comments,  
+                </param>
+			</result>
+		</action>
+		
+		<action name="edit_page" class="screenBuilderAction" method="preparePageForEdit">
+			<result name="success" type="json">
+				<param name="includeProperties"> page.*, hotSpots.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, pages.*, page.*\.project, page.*\.layout, page.*\.hotSpot, page.*\.hotSpots, page.*\.comments,  
+	            </param>
+	        </result>
+		</action>
+		
+		<action name="remove_page" class="screenBuilderAction" method="removePage">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, page.*\.pkey </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, pages.*, page.*\.project, page.*\.layout, page.*\.hotSpot, page.*\.hotSpots, page.*\.comments,
+	            </param>
+	        </result>
+		</action>
+		
+		
+		
+		
+		<!-- HotSpot Related -->
+		
+		<action name="save_hot_spot_coordinates" class="screenBuilderAction" method="saveHotSpotCoordinates">
+			<result name="success" type="json">
+				<param name="includeProperties"> hotSpot.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, .*\.hotSpots, .*\.comments,
+	            </param>
+	        </result>
+		</action>
+		
+		<action name="save_hot_spot" class="screenBuilderAction" method="saveHotSpot">
+			<result name="success" type="json">
+				<param name="includeProperties"> hotSpot.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, .*\.hotSpots, .*\.comments,
+	            </param>
+	        </result>
+		</action>
+		
+		<action name="edit_hot_spot" class="screenBuilderAction" method="prepareHotSpotForEdit">
+			<result name="success" type="json">
+				<param name="includeProperties"> hotSpot.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, .*\.hotSpots, .*\.comments, hotSpots.*,
+	            </param>
+	        </result>
+		</action>
+		
+		<action name="remove_hot_spot" class="screenBuilderAction" method="removePageHotSpot">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, .*\.hotSpots, .*\.comments, hotSpots.*,
+	            </param>
+	        </result>
+		</action>
+		
+		<action name="fetch_all_hot_spots" class="screenBuilderAction" method="fetchAllHotSpotsOfPage">
+			<result name="success" type="json">
+				<param name="includeProperties"> hotSpots.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, .*\.hotSpots, .*\.comments,
+	            </param>
+	        </result>
+		</action>
+		
+		
+		<!-- UIEvent related -->
+		
+		<action name="edit_ui_event" class="screenBuilderAction" method="prepareUiEventForEdit">
+			<result name="success" type="json">
+				<param name="includeProperties"> uiEvent.*, hotSpot.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer, .*\.hotSpots, .*\.comments, hotSpots.*,
+	            </param>
+	        </result>
+		</action>
+		
+		<action name="remove_ui_event" class="screenBuilderAction" method="removeHotSpotUiEvent">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, hotSpots.* </param>
+				<param name="excludeProperties">
+	                .*\.hibernateLazyInitializer,
+	            </param>
+	        </result>
+		</action>
+		
+		
+	</package>
+	
+	
+	<!-- Project comments related  -->
+	
+	<package name="project-comments" namespace="/project/comment" extends="json-default">
+		
+		<action name="post" class="projectAction" method="postComment">
+			<result name="success" type="json">
+				<param name="includeProperties"> comment.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer, comment.*\.page, comment.*\.project,
+                </param>
+			</result>
+		</action>
+		
+		<action name="remove" class="projectAction" method="deleteComment">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+		
+	
+	</package>
+	
+	
+	<!-- Project Publishing related  -->
+	
+	<package name="projectPublishing" namespace="/publish" extends="json-default">
+	
+		<action name="preview" class="publishingAction" method="generateProjectPreview">
+			<result name="success">/pages/publish/publish_preview.jsp</result>
+		</action>
+		
+		<action name="fetch_details" class="publishingAction" method="fetchProjectPublishDetails">
+			<result name="success" type="json">
+				<param name="includeProperties"> publishDetails.*, appUsers.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+	
+		<action name="manage_details" class="publishingAction" method="manageProjectPublishDetails">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>	
+	
+		<action name="mobile" class="publishingAction" method="publishProjectForMobile">
+			<result name="success">/pages/publish/publish_mobile.jsp</result>
+		</action>
+		
+		<action name="web" class="publishingAction" method="publishProjectForWeb">
+			<result name="success">/pages/publish/publish_web.jsp</result>
+		</action>
+		
+		
+		<!-- QR Codes .. -->
+		
+		<action name="mobile_qrcode" class="publishingAction" method="generateQRCodeForMobilePublishing">
+			<result name="success" type="stream">
+				<param name="contentType">${imageFile.fileObjContentType}</param>
+			    <param name="contentDisposition">filename="${imageFile.fileObjFileName}"</param> 
+               	<param name="inputName">fileStream</param>
+			</result>
+		</action>
+		
+		
+	</package>
+
+	
+	
+	<!-- Images related -->
+	
+	<package name="image" namespace="/image" extends="json-default">
+		
+		<action name="view" class="screenBuilderAction" method="fetchProjectImage">
+			<result name="success" type="stream">
+				<param name="contentType">${imageFile.fileObjContentType}</param>
+			    <param name="contentDisposition">filename="${imageFile.fileObjFileName}"</param> 
+               	<param name="inputName">fileStream</param>
+			</result>
+		</action>
+		
+		<action name="thumbnail" class="screenBuilderAction" method="fetchProjectImageThumbNail">
+			<result name="success" type="stream">
+				<param name="contentType">${imageFile.fileObjContentType}</param>
+			    <param name="contentDisposition">filename="${imageFile.fileObjFileName}"</param> 
+               	<param name="inputName">fileStream</param>
+			</result>
+		</action>
+		
+		<action name="remove" class="screenBuilderAction" method="deleteProjectImage">
+			<result name="success" type="json">
+				<param name="includeProperties">messageBean.*</param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+				
+	</package>
+	
+	
+	<!-- Search related  -->
+	
+	<package name="search" namespace="/search" extends="json-default">
+	
+	
+	</package>
+	
+	
+	<!-- Administrator related  -->
+	
+	<package name="administrator" namespace="/admin" extends="json-default">
+	
+		<action name="home" class="contentAction" method="prepareAdminHome">
+			<result name="success">/pages/admin/admin_home.jsp</result>
+		</action>
+		
+		<action name="project_approve" class="contentAction" method="approveProject">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+		
+		<action name="project_reject" class="contentAction" method="rejectProject">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+		
+		<action name="tag_save" class="contentAction" method="saveTag">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+		
+		<action name="tag_delete" class="contentAction" method="deleteTag">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.* </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer,
+                </param>
+			</result>
+		</action>
+		
+		
+	
+	
+	</package>
+	
+	
+	
+	<!-- Analytics related  -->
+	
+	<include file="struts-analytics.xml"></include>
+	
+</struts>

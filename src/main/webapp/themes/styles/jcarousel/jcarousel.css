@@ -1,0 +1,136 @@
+
+
+#carousel-cont .jcarousel-clip {
+    overflow: hidden;
+}
+
+#carousel-cont .jcarousel-clip-horizontal {
+  	height: 220px;
+    margin: 0 60px;
+    min-width: 600px;
+    padding: 5px 0;
+}
+
+#carousel-cont .jcarousel-container {
+/* 	min-height: 250px; */
+}
+
+#carousel-cont .jcarousel-direction-rtl {
+	direction: rtl;
+}
+
+#carousel-cont .jcarousel-container-horizontal {
+	 width: 100%;
+}
+
+/* Buttons */
+
+#carousel-cont .jcarousel-next-horizontal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    background: url('../../images/arrow-right.png') no-repeat 15px 90px transparent;
+    height: 205px;
+    width: 60px;
+}
+
+#carousel-cont .jcarousel-direction-rtl .jcarousel-next-horizontal {
+    left: 5px;
+    right: auto;
+    background-image: url('../../images/arrow-right.png');
+}
+
+#carousel-cont .jcarousel-next-disabled-horizontal,
+#carousel-cont .jcarousel-next-disabled-horizontal:hover,
+#carousel-cont .jcarousel-next-disabled-horizontal:focus,
+#carousel-cont .jcarousel-next-disabled-horizontal:active {
+    cursor: default;
+    background-position: -96px 0;
+}
+
+#carousel-cont .jcarousel-prev-horizontal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    background: url('../../images/arrow-left.png') no-repeat 15px 90px transparent;
+    height: 205px;
+    width: 60px;
+}
+
+#carousel-cont .jcarousel-direction-rtl .jcarousel-prev-horizontal {
+    left: auto;
+    right: 5px;
+    background-image: url('../../images/arrow-left.png');
+}
+
+#carousel-cont .jcarousel-prev-disabled-horizontal,
+#carousel-cont .jcarousel-prev-disabled-horizontal:hover,
+#carousel-cont .jcarousel-prev-disabled-horizontal:focus,
+#carousel-cont .jcarousel-prev-disabled-horizontal:active {
+    cursor: default;
+    background-position: -96px 0;
+}
+
+
+
+
+
+/* Home Carousel */
+
+#home-carousel {
+    display: block;
+    margin: 40px auto;
+    width: 960px;
+    text-align: center;
+}
+
+#home-carousel .jcarousel-item-placeholder {
+    background: #fff;
+    color: #000;
+}
+
+#home-carousel li {
+	margin: 10px 2px;
+	text-align: center;
+}
+
+#home-carousel label {
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: bold;
+	color: #666F29;
+	float: none;
+	display: block;
+}
+
+#home-carousel img {
+	margin: 10px auto;
+}
+
+/* page-list Carousel */
+
+#droppable-overlay {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	bottom: 10px;
+	left: 10px;
+	
+	z-index: 10;
+	
+	background: rgba(51, 51, 51, 0.5);
+	color: #333333;
+	text-align: center;
+}
+
+#droppable-overlay label {
+	font-size: 24px;
+    font-weight: bold;
+    margin: 90px auto;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+}
+

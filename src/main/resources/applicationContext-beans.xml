@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+	<!-- Properties file place holder -->
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+                <value>classpath*:stitchemapp.properties</value>
+                <value>classpath*:social_auth.properties</value>
+			</list>
+		</property>
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="searchSystemEnvironment" value="true" />
+	</bean>
+
+
+	<!-- JPA Beans Processor -->
+	
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+	
+	<!-- Entity Manager -->
+	
+	<bean id="entityManagerFactory"	class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="database" value="MYSQL" />
+				<property name="showSql" value="true" />
+				<property name="generateDdl" value="true" />
+			</bean>
+		</property>
+		<property name="jpaPropertyMap">
+      		<map>
+		        <entry key="hibernate.c3p0.min_size" value="5"/>
+		        <entry key="hibernate.c3p0.max_size" value="20"/>
+		        <entry key="hibernate.c3p0.timeout" value="1800"/>
+		        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect"/>
+      		</map>
+    	</property>
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+        </property>
+	</bean>
+
+
+	<!-- Transaction manager -->
+	
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+
+	<!-- Dao Beans -->
+	
+	<bean id="genericDao" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target"  ref="genericDaoImpl" />
+    </bean>
+    
+	<bean id="genericDaoImpl" class="com.stitchemapp.daos.GenericJpaDao"/>
+
+	<bean id="genericAuditDaoImpl" class="com.stitchemapp.daos.GenericAuditJpaDao" />
+
+	
+	<!-- Interceptor beans -->
+	
+	
+	
+	<!-- Action Beans -->
+	
+	<bean id="genericActionSupport" class="com.stitchemapp.actions.GenericActionSupport" scope="prototype">
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<bean id="homeAction" class="com.stitchemapp.actions.HomeAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
+		<property name="projectService" ref="projectService" />
+		<property name="contentService" ref="contentService" />
+	</bean>
+	
+	<bean id="userAction" class="com.stitchemapp.actions.UserAction" scope="prototype">
+		<property name="userService" ref="userService" />
+	
+		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
+	</bean>
+	
+	<bean id="userAccountAction" class="com.stitchemapp.actions.UserAccountAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="userAccountService" ref="userAccountService" />
+		<property name="projectService" ref="projectService" />
+	</bean>
+	
+	<bean id="projectAction" class="com.stitchemapp.actions.ProjectAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="projectService" ref="projectService" />
+		<property name="contentService" ref="contentService" />
+		<property name="ScreenBuilderService" ref="ScreenBuilderService" />
+		<property name="publishingService" ref="publishingService" />
+	</bean>
+	
+	<bean id="screenBuilderAction" class="com.stitchemapp.actions.ScreenBuilderAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="projectService" ref="projectService" />
+		<property name="ScreenBuilderService" ref="ScreenBuilderService" />
+	</bean>
+	
+	<bean id="publishingAction" class="com.stitchemapp.actions.PublishingAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="projectService" ref="projectService" />
+		<property name="ScreenBuilderService" ref="ScreenBuilderService" />
+		<property name="publishingService" ref="publishingService" />
+		<property name="contentService" ref="contentService" />
+	</bean>
+	
+	<bean id="contentAction" class="com.stitchemapp.actions.ContentAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="contentService" ref="contentService" />
+		<property name="projectService" ref="projectService" />
+	</bean>
+	
+	
+	<!-- Action Beans Ends -->
+	
+	
+
+	<!-- Service Beans -->
+	
+	<bean id="userAccountService" class="com.stitchemapp.services.impl.UserAccountServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+	</bean>
+	
+	<bean id="projectService" class="com.stitchemapp.services.impl.ProjectServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+		
+	</bean>
+	
+	<bean id="ScreenBuilderService" class="com.stitchemapp.services.impl.ScreenBuilderServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+		<property name="projectService" ref="projectService" />
+		
+	</bean>
+	
+	<bean id="publishingService" class="com.stitchemapp.services.impl.PublishingServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+		<property name="projectService" ref="projectService" />
+		<property name="mailingService" ref="mailingService" />
+	</bean>
+	
+	<bean id="contentService" class="com.stitchemapp.services.impl.ContentServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+		
+	</bean>
+	
+	<!-- Service Beans Ends -->
+	
+	
+	
+	<!-- Mailer related Beans -->
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.smtp.host}" />
+		<property name="port" value="${mail.smtp.port}" />
+		<property name="username" value="${mail.sender.username}" />
+		<property name="password" value="${mail.sender.password}" />
+		
+		<property name="javaMailProperties">
+			<props>
+				<!-- Use SMTP transport protocol -->
+				<prop key="mail.transport.protocol">${mail.transport.protocol}</prop>
+				
+				<!-- Use SMTP-AUTH to authenticate to SMTP server -->
+				<prop key="mail.smtp.auth">${mail.smtp.auth}</prop>
+				
+				<!-- Use TLS to encrypt communication with SMTP server -->
+				<prop key="mail.smtp.starttls.enable">${mail.smtp.starttls.enable}</prop>
+				
+				<prop key="mail.debug">${mail.debug}</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="mailingService" class="com.stitchemapp.mail.MailingServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+		<property name="mailSender" ref="mailSender" />
+	</bean>
+	
+	<!-- Mailer related Beans Ends -->
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- Analytics Related Beans -->
+	
+	<!-- Actions -->
+	
+	<bean id="analyticsFeedForwardAction" class="com.stitchemapp.actions.AnalyticsFeedForwardAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="projectService" ref="projectService" />
+		<property name="publishingService" ref="publishingService" />
+		<property name="actionRecorder" ref="actionRecorder" />
+	</bean>
+	
+	<bean id="analyticsFeedBackAction" class="com.stitchemapp.actions.AnalyticsFeedBackAction" scope="prototype" >
+		<property name="userService" ref="userService" />
+		
+		<property name="projectService" ref="projectService" />
+		<property name="actionAnalyzer" ref="actionAnalyzer" />
+	</bean>
+
+
+	<!-- Services -->	
+	
+	<bean id="actionRecorder" class="com.stitchemapp.analytics.impl.ActionRecorderImpl">
+		<property name="genericDao" ref="genericDao" />
+	</bean>
+	
+	<bean id="actionAnalyzer" class="com.stitchemapp.analytics.impl.ActionAnalyzerImpl">
+		<property name="genericDao" ref="genericDao" />
+	</bean>
+	
+	<!-- Analytics Related Beans Ends -->
+	
+	
+
+</beans>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+		    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	
+	<!-- native Implementations -->
+	
+	<bean id="socialUserDetailsService" class="com.stitchemapp.security.social.SocialUserDetailsServiceImpl">
+		<property name="genericDao" ref="genericDao" />
+		<property name="mailingService" ref="mailingService" />
+		
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	
+	<!-- Social Authentication -->
+	
+	<bean id="abstractAuthenticationFactory" class="com.stitchemapp.security.impl.SocialAuthenticationFactoryImpl" scope="session" >
+		<aop:scoped-proxy/>
+	</bean>
+	
+	
+	<!-- FaceBook -->
+	
+	<bean id="facebookConnectionService" class="com.stitchemapp.security.social.FaceBookConnectionService" scope="session">
+		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="facebookAuthenticationProvider" name="facebook" class="com.stitchemapp.security.social.FaceBookAuthenticationProvider" scope="prototype">
+		<property name="socialConnectionService" ref="facebookConnectionService" />
+		
+		<property name="consumerKey" value="${facebook.consumerkey}" />
+		<property name="consumerSecret" value="${facebook.consumersecret}" />
+		<property name="authProviderUrl" value="${facebook.host}" />
+		
+		<property name="scope" value="${facebook.scope}" />
+		<property name="callBackUri" value="${facebook.callback}" />
+		
+	</bean>
+	
+	
+	<!-- Google -->
+	
+	<bean id="googleConnectionService" class="com.stitchemapp.security.social.GoogleConnectionService" scope="session">
+		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="googleAuthenticationProvider" name="google" class="com.stitchemapp.security.social.GoogleAuthenticationProvider" scope="prototype">
+		<property name="socialConnectionService" ref="googleConnectionService" />
+		
+		<property name="consumerKey" value="${google.consumerkey}" />
+		<property name="consumerSecret" value="${google.consumersecret}" />
+		<property name="authProviderUrl" value="${google.host}" />
+		
+		<property name="scope" value="${google.scope}" />
+		<property name="callBackUri" value="${google.callback}" />
+		
+	</bean>
+	
+	
+	<!-- Twitter -->
+	<!-- 
+	<bean id="twitterConnectionService" class="com.stitchemapp.security.social.TwitterConnectionService" scope="session">
+		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="googleAuthenticationProvider" name="google" class="com.stitchemapp.security.social.GoogleAuthenticationProvider" scope="prototype">
+		<property name="socialConnectionService" ref="twitterConnectionService" />
+		
+		<property name="consumerKey" value="${twitter.consumerkey}" />
+		<property name="consumerSecret" value="${twitter.consumersecret}" />
+		<property name="authProviderUrl" value="${twitter.host}" />
+		
+		<property name="scope" value="${twitter.scope}" />
+		<property name="callBackUri" value="${twitter.callback}" />
+		
+	</bean>
+	 -->
+	
+	
+
+</beans>

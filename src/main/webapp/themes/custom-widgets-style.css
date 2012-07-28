@@ -1,0 +1,341 @@
+
+
+/* Pop Up boxes ... */
+
+.pop-up {
+	padding: 10px 15px;
+/* 	min-width: 300px; */
+	min-height: 140px;
+	background-color: #FFFFFF;
+	overflow: hidden;
+}
+
+.pu-header {
+	padding: 5px 0 10px 0;
+	overflow: hidden;
+}
+
+.pu-title {
+	color: #999999;
+	font-size: 16px;
+	font-weight: bold;
+	padding: 0px 5px;
+}
+
+.pu-body {
+	padding: 40px 0 10px 0;
+	overflow: hidden;
+	position: relative;
+}
+
+.pu-body .msg-cont {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 40px;	
+}
+
+.pu-content {
+	overflow: hidden;
+}
+
+.pu-body label {
+	clear: both;
+	font-size: 13px;
+	font-weight: bold;
+	color: #666666;
+	display: block;
+	margin: 4px 0;
+	float: none;
+}
+
+.pu-body label.inp-label {
+	min-width: 90px;
+	text-align: right;
+	float: left;
+}
+
+.pu-body input {
+	float: right;
+}
+
+.pu-body li {
+	margin: 5px;
+	padding: 5px 0; 
+	overflow: hidden;
+}
+
+.pu-body .no-top-border {
+	border-top: none; 
+}
+
+.pu-footer {
+	overflow: hidden;
+}
+
+/* Sign-In Cont */
+
+#sign-in-cont {
+	padding: 0;
+}
+
+#sign-in-cont .pu-body {
+	border-bottom: 1px solid #E5E5E5;
+}
+
+#loginForm {
+    margin: 20px 40px 40px;
+}
+
+#loginForm input {
+	display: block;
+    float: none;
+    margin: 0 auto;
+    padding: 5px 0;
+    width: 275px;
+    
+    -webkit-box-shadow: 0 0 0 0 #CCCCCC inset;
+	-moz-box-shadow: 0 0 0 0 #CCCCCC inset;
+	box-shadow: 0 0 0 0 #CCCCCC inset;
+	
+	border: 1px solid #CCCCCC;
+	border-top-color: #C0B2B0;
+}
+
+#username-input {
+	-webkit-border-radius: 8px 8px 0 0;
+	-moz-border-radius: 8px 8px 0 0;
+	border-radius: 8px 8px 0 0;
+	
+	background: url(images/icon-username.png) no-repeat 5px center #F6F6F6;
+	padding-left: 30px !important;
+}
+
+#password-input {
+	border-top: none !important;	
+	
+	-webkit-border-radius: 0 0 8px 8px;
+	-moz-border-radius: 0 0 8px 8px;
+	border-radius: 0 0 8px 8px;
+	
+	background: url(images/icon-password.png) no-repeat 7px center #F6F6F6;
+	padding-left: 30px !important;
+}
+
+#signin-input {
+	-webkit-box-shadow: 0 0 0 1px #9A9A9A inset !important;
+	-moz-box-shadow: 0 0 0 1px #9A9A9A inset !important;
+	box-shadow: 0 0 0 1px #9A9A9A inset !important;
+	
+	margin: 15px 0 0 !important;
+	padding: 0 15px;
+	width: 307px !important;
+	border: 3px solid #CCCCCC !important;
+}
+
+#ext-signin {
+	background-color: #E4E4E4;
+	border-top: 1px solid #FFFFFF;
+	height: 50px;
+}
+
+#ext-signin li {
+	margin: 0;
+}
+
+#ext-signin label {
+	color: #999999;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 14px;
+}
+
+#ext-signin input[type=submit] {
+	height: 50px;
+    width: 60px;
+}
+
+#ext-signin input[type=submit]:HOVER {
+	-webkit-box-shadow: 0 0 2px 2px #999999 inset;
+	-moz-box-shadow: 0 0 2px 2px #999999 inset;
+	box-shadow: 0 0 2px 2px #999999 inset;
+}
+
+#signin-fb {
+	background: url("images/fb-dark.png") no-repeat scroll center center transparent;
+}
+
+#signin-fb:HOVER {
+	background: url("images/fb-light.png") no-repeat scroll center center #AAAAAA;
+}
+
+#signin-gg {
+	background: url("images/google-dark.png") no-repeat scroll center center transparent;
+}
+
+#signin-gg:HOVER {
+	background: url("images/google-light.png") no-repeat scroll center center #AAAAAA;
+}
+
+#signin-tw {
+	background: url("images/twitter-dark.png") no-repeat scroll center center transparent;
+}
+
+#signin-tw:HOVER {
+	background: url("images/twitter-light.png") no-repeat scroll center center #AAAAAA;
+}
+
+
+#new-project-popup {
+	width: 300px;	
+}
+
+/* fancybox styles  */
+
+#fancybox-outer {
+	background: none;
+}
+
+#fancybox-content {
+
+	background: transparent;
+	border: 8px solid rgba(0, 0, 0, .5);
+
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	
+	/* 
+	-webkit-box-shadow: 0px 0px 12px 4px #777777;
+	-moz-box-shadow: 0px 0px 12px 4px #777777;
+	box-shadow: 0px 0px 12px 4px #777777;
+	 */
+	 
+	/* Check this */
+	overflow: visible;
+
+}
+
+.fancybox-bg {
+	background: none !important;
+}
+
+/* Specific Styles */
+
+#project-publish-popup {
+	min-width: 740px;
+}
+
+#project-publish-popup input {
+	float: none;
+}
+
+#publish-msg-cont {
+	width: 320px;
+	margin-right: 20px;	
+}
+
+#publish-users-cont {
+	border-left: 2px dotted #CCCCCC; 
+	padding-left: 30px;
+	min-height: 160px; 
+	padding-bottom: 20px;
+}
+
+#publish-users-cont li {
+	margin: 0;
+}
+
+#app-users-list {
+	
+}
+
+#app-users-list label {
+	min-width: 250px;
+	float: left;
+	margin: 0 0 3px;
+}
+
+
+
+
+/* ToolTips */
+
+.tooltip-content {
+	display: none;
+	min-width: 300px;
+	position: absolute;
+}
+
+#tt-cont {
+	position: absolute;
+	z-index: 100;
+}
+
+.tt-outer {
+	padding: 12px;
+	background: url("images/tt-pointer.png") no-repeat scroll 0 20px transparent;
+}
+
+.tt-outer.no-pointer {
+	background: none transparent;
+}
+
+.tt-outer.left-top {
+	padding: 4px 12px;
+}
+
+
+
+.tt-inner {
+	background-color: #FFFFFF;
+	padding: 8px 12px;
+	
+	color: #000000;
+	overflow: hidden;
+	border: 3px solid #E2DCDC;
+	
+	-webkit-box-shadow: 0 0 0 1px #9A9A9A inset;
+	-moz-box-shadow: 0 0 0 1px #9A9A9A inset;
+	box-shadow: 0 0 0 1px #9A9A9A inset;
+}
+
+
+
+#tt-cont .close-tt,
+.tooltip-content .close-tt {
+	float: right;
+	font-weight: bold;
+}
+
+#tt-cont #tt-body {
+	position: relative;
+}
+
+#tt-cont .key,
+.tooltip-content .key {
+	min-width: 30px;
+/* 	font-style: italic; */
+	font-weight: bold;
+}
+
+#tt-cont .title,
+.tooltip-content .title  {
+	font-weight: bold;
+}
+
+.page-tt-content {
+	
+}
+
+.hs-tt-content {
+	
+}
+
+.supp-img-tt-content {
+	min-width: 270px;
+}
+
+

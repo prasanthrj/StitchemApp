@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<decorators defaultdir="/WEB-INF/decorators">
+
+    <excludes>
+        <pattern>/themes/*</pattern>
+        <pattern>/scripts/*</pattern>
+        
+        <pattern>/images/*</pattern>
+        <pattern>/struts/*</pattern>
+        
+        <pattern>/nodecorate/*</pattern>
+        <pattern>/dojo/*</pattern>
+		<pattern>d-*-e*</pattern>
+    </excludes>
+   
+   	<decorator name="default" page="template_default.jsp">
+        <pattern>/*</pattern>
+	</decorator>
+	
+	<decorator name="building" page="template_build.jsp">
+		<pattern>/project/build/*</pattern>
+	</decorator>
+	
+	<decorator name="publishing" page="template_publish.jsp">
+		<pattern>/publish/mobile</pattern>
+		<pattern>/publish/preview</pattern>
+	</decorator>
+	
+
+</decorators>
