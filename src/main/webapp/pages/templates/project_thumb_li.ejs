@@ -1,0 +1,17 @@
+
+<li class="interaction">
+	<input type="hidden" class="project-pkey" value="<%= pkey %>">
+
+	<a href="<%= contextPath %>/project/view?project.pkey=<%= pkey %>" class="thumb">
+		<% if(layout.landingPage.screenImage.pkey) { %>
+			<img class="" alt="<%= title %>" src="<%= contextPath %>/image/view?project.pkey=<%= pkey %>&imageFile.pkey=<%= layout.landingPage.screenImage.pkey %>">
+		<% } %>
+	</a>
+	
+	<div>
+		<h2 class="auto-ellipses"><%= title %></h2>
+		<label class="proj-desc" style="display: none;">
+			<%= description %>
+		</label>
+	</div>
+</li>

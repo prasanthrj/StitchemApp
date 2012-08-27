@@ -10,16 +10,12 @@ import javax.persistence.Table;
 @Table(name = "project_publish_details")
 public class PublishDetails extends BaseEntity {
 	
-	
 	private String notes;
 	
 	private Page landingPage;
 	
 	private Boolean isPublished = false;
-	
 	private String passKey;
-	
-
 	
 	
 	/* Getters and Setters */

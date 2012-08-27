@@ -6,7 +6,7 @@
 <!DOCTYPE HTML>
 <script type="text/javascript">
 	$(document).ready(function(){
-		
+
 	});
 </script>
     

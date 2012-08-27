@@ -66,13 +66,13 @@
 	
 	
 	<!-- Twitter -->
-	<!-- 
+	
 	<bean id="twitterConnectionService" class="com.stitchemapp.security.social.TwitterConnectionService" scope="session">
 		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
 		<aop:scoped-proxy/>
 	</bean>
 	
-	<bean id="googleAuthenticationProvider" name="google" class="com.stitchemapp.security.social.GoogleAuthenticationProvider" scope="prototype">
+	<bean id="twitterAuthenticationProvider" name="twitter" class="com.stitchemapp.security.social.TwitterAuthenticationProvider" scope="prototype">
 		<property name="socialConnectionService" ref="twitterConnectionService" />
 		
 		<property name="consumerKey" value="${twitter.consumerkey}" />
@@ -83,7 +83,6 @@
 		<property name="callBackUri" value="${twitter.callback}" />
 		
 	</bean>
-	 -->
 	
 	
 

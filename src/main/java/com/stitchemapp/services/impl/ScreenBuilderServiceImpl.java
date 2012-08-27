@@ -92,7 +92,7 @@ public class ScreenBuilderServiceImpl implements ScreenBuilderService {
 	public void deleteImageFile(ImageFile imageFile) {
 		if(imageFile != null) {
 			
-			if(imageFile.getImageType().equals(ImageFileType.ScreenImage)){
+			if(imageFile.getImageType().equals(ImageFileType.screen)){
 				Page page = fetchPageByScreenImage(imageFile);
 				deletePage(page);
 			} else {
@@ -132,35 +132,35 @@ public class ScreenBuilderServiceImpl implements ScreenBuilderService {
 	public List<ImageFile> fetchProjectScreenImages(Project project) {
 		Hashtable<String, Object> ht = new Hashtable<String, Object>();
 		ht.put("project", project);
-		ht.put("imageType", ImageFileType.ScreenImage);
+		ht.put("imageType", ImageFileType.screen);
 		return genericDao.getEntities(ImageFile.class, "images.selectProjectImagesByType", ht);
 	}
 	
 	public List<ImageFile> fetchProjectHeaderImages(Project project) {
 		Hashtable<String, Object> ht = new Hashtable<String, Object>();
 		ht.put("project", project);
-		ht.put("imageType", ImageFileType.Header);
+		ht.put("imageType", ImageFileType.header);
 		return genericDao.getEntities(ImageFile.class, "images.selectProjectImagesByType", ht);
 	}
 	
 	public List<ImageFile> fetchProjectFooterImages(Project project) {
 		Hashtable<String, Object> ht = new Hashtable<String, Object>();
 		ht.put("project", project);
-		ht.put("imageType", ImageFileType.Footer);
+		ht.put("imageType", ImageFileType.footer);
 		return genericDao.getEntities(ImageFile.class, "images.selectProjectImagesByType", ht);
 	}
 	
 	public List<ImageFile> fetchProjectLeftNavImages(Project project) {
 		Hashtable<String, Object> ht = new Hashtable<String, Object>();
 		ht.put("project", project);
-		ht.put("imageType", ImageFileType.LeftNavBar);
+		ht.put("imageType", ImageFileType.leftNav);
 		return genericDao.getEntities(ImageFile.class, "images.selectProjectImagesByType", ht);
 	}
 	
 	public List<ImageFile> fetchProjectRightNavImages(Project project) {
 		Hashtable<String, Object> ht = new Hashtable<String, Object>();
 		ht.put("project", project);
-		ht.put("imageType", ImageFileType.RightNavBar);
+		ht.put("imageType", ImageFileType.rightNav);
 		return genericDao.getEntities(ImageFile.class, "images.selectProjectImagesByType", ht);
 	}
 	
@@ -264,25 +264,25 @@ public class ScreenBuilderServiceImpl implements ScreenBuilderService {
 		/* Image File Type is known from the ImageFile itself .... avoid extra param "imageFileType" */
 		ImageFileType imageFileType = imageFile.getImageType();
 		
-		if (imageFile.getPkey() == -1) {
+		if (imageFile.getPkey() == 0) {
 			imageFile = null;
 		}
 		
 		if(page != null) {
 			switch (imageFileType) {
-				case ScreenImage:
+				case screen:
 					// TODO update screenImage ...
 					break;
-				case Header:
+				case header:
 					page.setHeaderImage(imageFile);
 					break;
-				case Footer:
+				case footer:
 					page.setFooterImage(imageFile);
 					break;
-				case LeftNavBar:
+				case leftNav:
 					page.setLeftNavImage(imageFile);
 					break;
-				case RightNavBar:
+				case rightNav:
 					page.setRightNavImage(imageFile);
 					break;
 	

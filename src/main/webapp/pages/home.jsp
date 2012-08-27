@@ -12,12 +12,19 @@
 
 	<script type="text/javascript">
 		
+		var contextPath = '<%= request.getContextPath() %>';
 		
 		var isProjectsPageLoded = true;
-		
 		var currentPageNumber = 1;
 	
 		$(document).ready(function() {
+			
+			/* Window resize related ... */
+			
+			adjustToWindowDimentions(); 
+			$(window).resize(function() {
+				adjustToWindowDimentions(); 
+			});
 			
 			/* Tags */
 			
@@ -46,6 +53,7 @@
 			$('#new-pattern-submit-btn').live('click', function(){
 				var newPatternForm = $('#new-pattern-form');
 				newPatternForm.validateForm({
+					breakOnError : false,
 					failureFunction : function(element){
 						$(element).addClass('error');
 					},
@@ -64,17 +72,8 @@
 				var scrollThreshold = $(document).height() - ( $(window).height() + 500 );
 				if ( ( $(window).scrollTop() > scrollThreshold ) && isProjectsPageLoded ){
 					isProjectsPageLoded = false;
-// 					fetchProjectsByPage(currentPageNumber + 1);
+					fetchProjectsByPage(currentPageNumber + 1);
 				}
-			});
-			
-			
-			
-			/* Window resize related ... */
-			
-			adjustToWindowDimentions(); 
-			$(window).resize(function() {
-				adjustToWindowDimentions(); 
 			});
 			
 		});
@@ -120,8 +119,12 @@
 					
 					var projListHtml = '';
 					
+					var projLiHtml = '';
 					for ( var i = 0; i < data.projects.length; i++) {
 						var project = data.projects[i];
+						
+						projLiHtml += new EJS({url: contextPath + '/pages/templates/project_thumb_li.ejs'}).render(project);
+						
 						
 						projListHtml += '<li class="interaction" style="margin-left : ' + currLiHorMargin + 'px; margin-right : ' + currLiHorMargin + 'px; ">';
 						projListHtml += '<a href="javascript:void(0);" onclick="loadProjectPreview(' + project.pkey + ')" class="thumb">';
@@ -144,7 +147,12 @@
 						
 					}
 					
-					$('#interactions-list').append(projListHtml);
+					$('#interactions-list').append(projLiHtml);
+					
+					$('li.interaction').css({
+						'margin-left' : marginOnEachSide + 'px',
+						'margin-right' : marginOnEachSide + 'px'
+					});
 					
 					// Global Variables .. 
 					if(data.projects.length > 0 ) {
@@ -174,7 +182,10 @@
 			
 			<div class="float-fix" style="margin: 20px auto; width: 960px; padding: 15px 0;">
 				<label class="normal" style="width: 600px; padding: 15px; font-size: 28px; line-height: 32px;">Create and share mobile mockups like never before.</label>
-				<a href="<%= request.getContextPath() %>/signup" class="float-right btn margin-5px"> signup now </a>
+				
+				<auth:authorize ifAnyGranted="ROLE_ANONYMOUS">
+					<a href="<%= request.getContextPath() %>/signup" class="float-right btn margin-5px"> signup now </a>
+				</auth:authorize>
 			</div>
 			
 			<ul id="home-carousel" class="inline-list">
@@ -260,7 +271,7 @@
 					<label class="title"> Stitch a New Pattern </label>
 					<p> Pattern should represent a complete navigation sequence from a Mobile Project, explained in maximum of 10 slides. </p>
 					
-					<form action="<%= request.getContextPath() %>/project/save" id="new-pattern-form" method="post">
+					<form action="<%= request.getContextPath() %>/project/settings" id="new-pattern-form" method="post">
 						
 						<section style="display: none;">
 							<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
@@ -305,7 +316,6 @@
 								<input type="email" placeholder="will be used for account creation" class="mandatory emailid" name="user.emailId" value="<s:property value="loggedInUser.emailId"/>">
 							</li>
 							<li>
-<!-- 								<input type="submit" id="new-pattern-submit-btn" value="" class="" onsubmit=""> -->
 								<input type="button" id="new-pattern-submit-btn" value="" class="">
 							</li>
 						</ul> 
@@ -321,24 +331,20 @@
 			<s:iterator value="projects" var="project">
 	  		
 		  		<li class="interaction">
-		  		
-<%-- 		  			<a href="<%= request.getContextPath() %>/publish/mobile?project.pkey=<s:property value="%{#project.pkey}" />"> --%>
-<%-- 		  			<a href="<%= request.getContextPath() %>/project/build/prepare?project.pkey=<s:property value="%{#project.pkey}" />"> --%>
-					
+		  			<input type="hidden" class="project-pkey" value="<s:property value="%{#project.pkey}" />">
+		  			
 					<a href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />" class="thumb">	
 						<s:if test="%{#project.layout.landingPage.screenImage.pkey != null}">
 	 						<img class="" alt="<s:property value="%{#project.layout.landingPage.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#project.layout.landingPage.screenImage.pkey}" />">
 	 					</s:if>
 					</a>
+					
 					<div>
 						<h2 class="auto-ellipses"><s:property value="%{#project.title}" /></h2>
 						<label class="proj-desc" style="display: none;">
 							<s:property value="%{#project.description}" />
 						</label>
 					</div>
-		  			
-					<input type="hidden" class="project-pkey" value="<s:property value="%{#project.pkey}" />">
-		  			
 		  		</li>
 	 		
 			</s:iterator>

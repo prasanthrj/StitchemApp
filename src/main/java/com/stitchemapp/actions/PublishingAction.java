@@ -87,12 +87,12 @@ public class PublishingAction extends GenericActionSupport {
         if (appUserPkey != null && StringUtils.isNotEmpty(appUserPkey)){
         	appUser = userService.readUser(Integer.valueOf(appUserPkey));
         }
-        
+
         String publishDetailsPkey = this.request.getParameter("publishDetails.pkey");
         if (publishDetailsPkey != null && StringUtils.isNotEmpty(publishDetailsPkey)){
         	publishDetails = publishingService.readPublishDetails(Integer.valueOf(publishDetailsPkey));
         }
-                
+
 	}
 	
 	

@@ -99,6 +99,32 @@
 			adjustBodyToWindowDimensions();
 		});
 		
+		$('#join-now-btn').live('click', function(){
+			var userRegistrationForm = $('#user-registration-form');
+			userRegistrationForm.validateForm({
+				breakOnError : false,
+				failureFunction : function(element){
+					$(element).addClass('error');
+				},
+				successFunction : function(element){
+					$(element).removeClass('error');
+				},
+				onValidForm : function(form){
+					var pswd = $('#user-pswd');
+					var cnfPswd = $('#user-confirm-pswd');
+					
+					if(pswd.val() == cnfPswd.val()) {
+						$(form).trigger('submit');	
+					} else {
+						pswd.addClass('error');
+						cnfPswd.addClass('error');
+						showNotificationMsg("error", "Confirm password" );
+					}
+				}
+			});
+			
+		});
+		
 		
 		
 	});
@@ -116,7 +142,17 @@
 		</div>
 	</div>
 		
-	<div id="main-cont"> 
+	<div id="main-cont">
+	
+		<div id="notification-cont" style="display: none;">
+			<div id="notification-box" class="error">
+				<a href="javascript:void" class="float-left skull-icon-white" id="noification-icon"></a>
+				<span class="msg-text"> Something Went Wrong !!! </span>
+				<a href="javascript:void(0);" class="float-right close-icon-white" id="noification-close"></a>
+			</div>
+		</div>
+		
+		 
 		<div id="signup-cont" class="float-fix">
 			
 			<div id="ext-signup" class="float-fix">
@@ -146,28 +182,28 @@
 			</div>
 			
 			<div id="native-signup-cont">
-				<form action="<%= request.getContextPath() %>/user/register" method="post">
+				<form action="<%= request.getContextPath() %>/user/register" id="user-registration-form" method="post">
 						
 					<!-- Social Details -->
 					<input type="hidden" name="socialDetails.providerId" value="<s:property value="socialDetails.providerId"/>">
 					
 					<ul id="signup-list">
 						<li>
-							<input type="text" name="user.fullName" value="<s:property value="socialDetails.displayName"/>" placeholder="name">
+							<input type="text" class="mandatory" name="user.fullName" value="<s:property value="socialDetails.displayName"/>" placeholder="name">
 						</li>
 						<li>
-							<input type="email" name="user.emailId" value="<s:property value="socialDetails.emailId"/>" placeholder="email-id">
+							<input type="email" class="mandatory emailId" name="user.emailId" value="<s:property value="socialDetails.emailId"/>" placeholder="email-id">
 						</li>
 						<li>
-							<input type="text" name="user.username" value="" placeholder="username">
+							<input type="text" class="mandatory" name="user.username" value="" placeholder="username">
 						</li>
 						<li>
-							<input type="password" name="user.password" value="" placeholder="password" class="float-left">
-							<input type="password" name="confirm_password" value="" placeholder="confirm password" class="float-right">
+							<input type="password" id="user-pswd" name="user.password" value="" placeholder="password" class="mandatory float-left" >
+							<input type="password" id="user-confirm-pswd" value="" placeholder="confirm password" class="mandatory float-right">
 						</li>
 						
 						<li class="padding-5px">
-							<input type="submit" value="Join Now" name="join now" class="btn btn-yellow">
+							<input type="button" id="join-now-btn" value="Join Now" name="join now" class="btn btn-yellow" style="width: 442px;">
 						</li>
 					</ul>
 				</form>

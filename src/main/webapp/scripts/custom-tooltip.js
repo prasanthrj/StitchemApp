@@ -22,7 +22,9 @@ $.widget("ui.customToolTip",{
 				'position' : 'absolute',
 				'z-index' : this.options.zIndex,
 				'min-width' : this.options.minWidth,
-				'max-width' : this.options.maxWidth
+				'max-width' : this.options.maxWidth,
+				'min-height' : this.options.minHeight,
+				'max-height' : this.options.maxHeight
 			});
 			
 			// pre-load function
@@ -61,6 +63,8 @@ $.widget("ui.customToolTip",{
 		
 		maxWidth : '250px',
 		minWidth : '150px',
+		maxHeight : '250px',
+		minHeight : '80px',
 		
 		// Callbacks
 		preLoadFunc : function(element){},

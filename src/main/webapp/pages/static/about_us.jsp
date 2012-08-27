@@ -47,10 +47,8 @@
 
 	<!-- Body Content -->
 
-	<div id="top-cont" class="yellow-bg">
-		<div id="page-title-cont" class="float-left">
-			<label class="page-title"> About Us </label>		
-		</div>
+	<div id="page-title-cont" class="float-left">
+		<label class="page-title"> About Us </label>		
 	</div>
 		
 	<div id="main-cont"> 

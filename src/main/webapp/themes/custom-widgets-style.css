@@ -225,31 +225,34 @@
 /* Specific Styles */
 
 #project-publish-popup {
-	min-width: 740px;
+	min-width: 440px;
 }
 
 #project-publish-popup input {
 	float: none;
 }
 
-#publish-msg-cont {
-	width: 320px;
-	margin-right: 20px;	
+#project-publish-popup .custom-radio {
+	margin: 5px 8px;
 }
 
-#publish-users-cont {
-	border-left: 2px dotted #CCCCCC; 
-	padding-left: 30px;
-	min-height: 160px; 
-	padding-bottom: 20px;
+#project-publish-popup .inp-box {
+	width: 420px;
 }
 
-#publish-users-cont li {
-	margin: 0;
+#publish-contacts-cont {
+	margin: 15px 3px;
 }
 
 #app-users-list {
-	
+	margin: 10px 3px;
+	overflow: hidden;
+}
+
+#app-users-list li {
+	border-top: 1px solid #999999;
+    overflow: hidden;
+    padding: 4px 0;
 }
 
 #app-users-list label {
@@ -265,29 +268,34 @@
 
 .tooltip-content {
 	display: none;
-	min-width: 300px;
 	position: absolute;
-}
-
-#tt-cont {
-	position: absolute;
-	z-index: 100;
+	z-index: 110;
 }
 
 .tt-outer {
 	padding: 12px;
-	background: url("images/tt-pointer.png") no-repeat scroll 0 20px transparent;
-}
-
-.tt-outer.no-pointer {
-	background: none transparent;
+	
 }
 
 .tt-outer.left-top {
 	padding: 4px 12px;
+	background: url("images/tt-pointer-left.png") no-repeat scroll left 20px transparent;
 }
 
+.tt-outer.right-top {
+	padding: 4px 12px;
+	background: url("images/tt-pointer-right.png") no-repeat scroll right 20px transparent;
+}
 
+.tt-outer.top-right {
+	padding: 12px 4px;
+	background: url("images/tt-pointer-top.png") no-repeat scroll 250px top transparent;
+}
+
+.tt-outer.bottom-right {
+	padding: 12px 4px;
+	background: url("images/tt-pointer-bottom.png") no-repeat scroll 250px bottom transparent;
+}
 
 .tt-inner {
 	background-color: #FFFFFF;
@@ -300,42 +308,75 @@
 	-webkit-box-shadow: 0 0 0 1px #9A9A9A inset;
 	-moz-box-shadow: 0 0 0 1px #9A9A9A inset;
 	box-shadow: 0 0 0 1px #9A9A9A inset;
+	
+	position: relative;
 }
 
-
-
-#tt-cont .close-tt,
 .tooltip-content .close-tt {
 	float: right;
 	font-weight: bold;
 }
 
-#tt-cont #tt-body {
-	position: relative;
-}
-
-#tt-cont .key,
-.tooltip-content .key {
-	min-width: 30px;
-/* 	font-style: italic; */
-	font-weight: bold;
-}
-
-#tt-cont .title,
-.tooltip-content .title  {
-	font-weight: bold;
-}
-
 .page-tt-content {
+	background: transparent;
+	border: none;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.page-tt-content .tt-outer {
+	padding: 0;
+}
+
+.page-tt-content .tt-inner {
+	height: 192px;
+/* 	width: 134px; */
+	background: transparent;
+	border: none;
 	
+	-webkit-box-shadow: 0 0 0 0 #9A9A9A inset;
+	-moz-box-shadow: 0 0 0 0 #9A9A9A inset;
+	box-shadow: 0 0 0 0 #9A9A9A inset;
+	
+	overflow: hidden;
+	padding: 0;
+}
+
+.page-tt-content .thumb-details-cont {
+	left: 0;
+    bottom: 0;
+    right: 0;
+    
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0.6);
+    color: #FFFFFF;
+    font-size: 10px;
+    text-align: center;
+    height: 16px;
+    padding: 4px 0;
+}
+
+.page-tt-content .thumb-details-cont label {
+	float: none;
+}
+
+.page-tt-content .thumb-details-cont a {
+	color: #FFFFFF;
+}
+
+.page-tt-content .custom-radio,
+.page-tt-content .custom-checkbox {
+	margin: 0 0 !important;
 }
 
 .hs-tt-content {
-	
+	min-width: 300px;
 }
 
 .supp-img-tt-content {
-	min-width: 270px;
+	width: 300px;
+	word-wrap: break-word;
 }
 
 

@@ -18,6 +18,10 @@
         <pattern>/*</pattern>
 	</decorator>
 	
+	<decorator name="home" page="template_home.jsp">
+		<pattern>/project/build/*</pattern>
+	</decorator>
+	
 	<decorator name="building" page="template_build.jsp">
 		<pattern>/project/build/*</pattern>
 	</decorator>

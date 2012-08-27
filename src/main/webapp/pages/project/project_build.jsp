@@ -11,9 +11,6 @@
 	<meta>
 	<title> Project Builder  </title>
 
-	<!-- Canvas Extended functions -->
-	<script type="text/javascript" src="<%= request.getContextPath() %>/scripts/canvas-prototype.js"></script>
-
 	<script type="text/javascript">
 	
 	var contextPath = '<%= request.getContextPath() %>';
@@ -27,23 +24,21 @@
 	
 	var scaledWidth = projectWidth;
 	var scaledHeight = projectHeight;
+	
+	var imageUrlPrefix = contextPath + '/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=';
 
 	var currNoOfPages = parseInt('<s:property value="pages.size()" />');
 	
+	var currLandingPagePkey = parseInt('<s:property value="project.layout.landingPage.pkey" />');
+	
 	var currPagePkey = parseInt('<s:property value="page.pkey" />');
 	var currPageObj = {};
-	
-	var currLandingPagePkey = parseInt('<s:property value="project.layout.landingPage.pkey" />');
-
 	var currentHotSpots = null;
-// 	var currentHotSpotsMap = {};
 	
-	var hsDivPrefix = 'hs-div-';
-	var hsContPrefix = 'hs-cont-';
-
-	var hotSpotsHolderId = 'canvas-cont';
 	var canVasElementId = "canvasElem";
-
+	var hotSpotsHolderId = 'canvas-cont';
+	var hsDivPrefix = 'hs-div-';
+	
 	var clickX = new Array();
 	var clickY = new Array();
 	var clickDrag = new Array();
@@ -54,14 +49,38 @@
 
 	</script>
 	
-	<!-- Canvas Builder Tools ...  -->
+	<script type="text/javascript" src="<%= request.getContextPath() %>/scripts/canvas-prototype.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/scripts/builder-functions.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/scripts/builder-tools.js"></script>
 	
 	<script type="text/javascript">
 	
 	$(document).ready( function() {
 		
-// 		$('.collapse-icon').trigger('click');
+		$('.scaled-width').css({ 'width' : scaledWidth + 'px' });
+		$('.scaled-height').css({ 'height' : scaledHeight + 'px' });
+		
+		
+		
+		/* Setting initial Visible Items ... */
+		var mainCont = $('#main-cont');
+		if(currNoOfPages != 0) {
+			mainCont.show();
+		}
+		
+		
+		/* Window resize related ... */
+		var buildCont = $('#build-cont'); 
+		buildCont.css({
+			'width' : scaledWidth + 'px',
+			'height' : scaledHeight + 'px'
+		});
+		
+		adjustToWindowDimentions();
+		$(window).resize(function() {
+			adjustToWindowDimentions();
+		});
+		
 		
 		/* Carousel ... */
 		var carouselPagesList = $('#pages-list');
@@ -72,65 +91,54 @@
 			});
 		}
 		
-		/* Setting initial Visible Items ... */
-		var mainCont = $('#main-cont');
-		if(currNoOfPages != 0) {
-			mainCont.show();
-		}
-		
-		
-		/* Window resize related ... */
-		
-		var buildCont = $('#build-cont'); 
-		buildCont.css({
-			'width' : projectWidth + 'px',
-			'height' : projectHeight + 'px'
-		});
-		
-		adjustToWindowDimentions();
-		$(window).resize(function() {
-			adjustToWindowDimentions();
-		});
-		
-		
 		/* Drag-Drop file Upload ... */
 		prepareFileDropUpload("carousel-cont");
 		
 		/* Set Landing Page */
 		if(currLandingPagePkey && currLandingPagePkey != '') {
+// 			updateAndSelectLandingPage(currLandingPagePkey);
 			$('#landing-page-radio-' + currLandingPagePkey ).check();
 		}
 		
 		/* Load the first page for editing .. */
-		if(currPagePkey && currPagePkey != '')
+		if(currPagePkey && currPagePkey != '') {
 			preparePageForEditing( currPagePkey );
-		
+		}
+			
 		/* Prepare Hotspots Editing */
-		prepareCanvasToolsForPage( currPagePkey );
+		prepareCanvasToolsForPage();
 		
 		
 		/* attach page editing and tool tip */
 		var toolTipCont = $('#tooltip-cont');
-		$('#pages-list li .page-thumb-image-cont').live('click', function(event){
-			var pagePkey = $(this).find('input.page-pkey').val();
-			preparePageForEditing( pagePkey, this );
+		$('#pages-list li .page-thumb-image-cont').live({
+			click : function(event){
+				var pagePkey = $(this).find('input.page-pkey').val();
+				preparePageForEditing( pagePkey, this );
+			},
+			mouseenter : function() {
+				var thumb = $(this);
+				var ttCont = thumb.find('.tooltip-content:first');
+				ttCont.show();
+			},
+			mouseleave : function() {
+				var thumb = $(this);
+				var ttCont = thumb.find('.tooltip-content:first');
+				ttCont.hide();
+			}
 		});
-		
-		attachCustomToolTipToCarouselItems();
 		
 		$('#pages-list li input[type=radio]').customInput();
 		
+		
+		
 		/* Page title */
 		
-		$('#managePageTitleForm').ajaxForm({
+		var managePageTitleForm = $('#managePageTitleForm');
+		managePageTitleForm.ajaxForm({
 			success: function (data){
 				if(data && data.page) {
-					
-// 					$('a.page-' + data.page.pkey + '-title').html(data.page.title);
-// 					$('option.page-' + data.page.pkey + '-title').html(data.page.title);
-					
 					$('.page-' + data.page.pkey + '-title').html(data.page.title);
-					
 					if(currPagePkey == data.page.pkey ) {
 						$('input.curr-page-title').attr('value', data.page.title);
 						$('a.curr-page-title').html(data.page.title);
@@ -140,23 +148,30 @@
 					showNotificationMsg( 'success', "Page title has been successfully updated to " +  data.page.title);
 				}
 			},
+			beforeSubmit: function (data){
+				var isFormValid = true;
+				managePageTitleForm.validateForm({
+					failureFunction : function(element){
+						$(element).addClass('error');
+						isFormValid = false;
+					},
+					successFunction : function(element){
+						$(element).removeClass('error');
+					},
+					onValidForm : function(form){
+						isFormValid = true;
+					}
+				});
+				
+				return isFormValid;
+			},
 			complete: function(){
 				$.fancybox.close(); 
 			} 
 		});
-			
+
 		
 		/* Page Screen */
-		
-		$('#page-screen-btn').live('click', function(){
-			var currentPagePkey = parseInt($('#curr-page-pkey').val()); 
-			if(currentPagePkey && currentPagePkey != '') {
-				$('#page-screen-input').trigger('click');
-			} else {
-				showNotificationMsg('status', "No screen exists");
-				alert('upload screens');
-			}
-		});
 		
 		$('#page-screen-input').live('change', function(){
 			
@@ -164,32 +179,27 @@
 			showNotificationMsg('status', "screen image uploading");
 			
 			$('#managePageScreenForm').ajaxForm({
-				success: function (data){
+				success: function (data) {
+					showNotificationMsg('success', "screen image successfully updated");
 					
-					console.log(data);
-					
-// 					if( data && data.messageBean ){ 
-// 						var msg = data.messageBean; 
-						
-// 						if(msg.messageType == 'error') { 
-// 							showNotificationMsg('success', "screen image update Failed"); 
-// 						} else { 
-							showNotificationMsg('success', "screen image successfully updated");
-// 							preparePageForEditing(currentPagePkey);
-							
-							// TODO Hack 
-							window.location.reload(true);
-// 						} 
-// 					} 
+					// TODO Handle this
+					window.location.reload(true);
 				},
 				complete: function(){} 
 			}).trigger('submit');
 		});
 		
+		$('.delete-page-icon').live('click', function(event){
+			preventEventDefaults(event);
+		});
+		
+		$('.landing-page-radio').live('click', function(event){
+			event.stopPropagation();
+		});
+		
 		$('#deletePageForm').ajaxForm({
 			success: function (data){
 				if( data && data.page ){
-					
 					var page = data.page;
 					var msgBean = data.messageBean;
 					
@@ -210,9 +220,7 @@
 						// TODO Hack 
 						window.location.reload(true);
 					}
-					
 				}
-				
 			},
 			complete: function(){
 				$.fancybox.close();
@@ -221,10 +229,6 @@
 		
 		
 		/* Supporting Images */
-		
-		$('.tooltip-content .close-tt').live('click', function(){
-			$(this).parents('.tooltip-content').hide('fade');
-		}); 
 
 		$('.delete-support-image-btn').live('click', function(){
 			var btn = $(this);
@@ -251,105 +255,6 @@
 			
 		});
 		
-		
-		/* Supporting Images select boxes */
-		
-		$('.supporting-images-list input[type=radio]').live('click', function(){
-			var radio = $(this);
-			var imagePkey = radio.val();
-			var imageType = radio.parents('.supporting-images-list:first').attr('imageType');
-			
-			var imgURL = '';
-			if(imagePkey != -1)
-				imgURL = '<%= request.getContextPath() %>/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=' + imagePkey ;
-			
-			var form = $('#update-supp-img-form'); 
-			form.find('.img-pkey').attr('value', imagePkey);
-			form.find('input[name$=imageType]').attr('value', imageType);
-			
-			form.ajaxForm({
-				beforeSubmit: function (data){},
-				success: function (data){
-					if(data) {
-						
-						// Setting up the image ... 
-						switch (imageType) {
-							case 'Header':
-								$('#canvas-header').attr('src', imgURL);
-								break;
-							case 'Footer':
-								$('#canvas-footer').attr('src', imgURL);
-								break;
-							case 'LeftNavBar':
-								$('#canvas-left-nav').attr('src', imgURL);
-								break;
-							case 'RightNavBar':
-								$('#canvas-right-nav').attr('src', imgURL);
-								break;
-	
-							default:
-								break;
-						}
-						
-					}
-				} 			
-			}).trigger('submit');
-			
-		});
-		
-
-		
-		
-		// Form Submission .... 
-		
-		var hotSpotCreateEditForm = $('#hotSpotCreateEditForm');
-		
-		hotSpotCreateEditForm.ajaxForm({
-			beforeSubmit: function (data){
-				var fromX = hotSpotCreateEditForm.find('input[name$=fromX]').val();
-				var toX = hotSpotCreateEditForm.find('input[name$=toX]').val();
-				
-				if (!fromX || !toX) 
-					return false;
-			},
-			success: function (data){
-				var currentHotSpotPkey = $('#hot-spot-pkey').val();
-				$('#'+ hsContPrefix + currentHotSpotPkey).trigger('click');
-				
-				$('.div-hotspot').removeClass('editable');
-				$('#hotspots-edit').slideUp('slow', function(){
-					$('#hotspots-info').slideDown('slow');
-				});
-				
-				// update page hotspots ... 
-				updatePageHotSpots();
-				
-			}
-		});
-		
-		
-		// Publish Related ...
-
-		$('.isPublic').live('click', function(){
-			var publishContacts = $('#publish-contacts-cont');
-			var publicNote = $('#publish-public-note');
-			
-			var isPublicRadio = $('input[name$=isPublic]');
-			
-			if(publishContacts.css('display') == 'block'){
-				publishContacts.hide();
-				publicNote.show('fade');
-				
-				isPublicRadio.attr('value', true);
-				
-			} else {
-				publicNote.hide();
-				publishContacts.show('fade');
-				
-				isPublicRadio.attr('value', false);
-			}
-		});
-		
 	});
 	
 	
@@ -370,12 +275,12 @@
 		
 		buildLeftCont.css({
 			'width' : widthForCont + 'px',
-			'height' : projectHeight + 'px'
+			'height' : scaledHeight + 'px'
 		});
 		
 		buildRightCont.css({
 			'width' : widthForCont + 'px',
-			'height' : projectHeight + 'px'
+			'height' : scaledHeight + 'px'
 		});
 		
 	};
@@ -470,104 +375,107 @@
 
 		/* Build Container */
 		
-		// ScreenImgURL ..
-		var pageScreenImagePkey = page.screenImage.pkey ;
-		
-		var pageHeaderImagePkey = -1;
-		if(page.headerImage && page.headerImage.pkey) 
-			pageHeaderImagePkey = page.headerImage.pkey;
-		$('#page-header-cont').find('input[value=' + pageHeaderImagePkey + ']').check();
-		
-		var pageFooterImagePkey = -1;
-		if(page.footerImage && page.footerImage.pkey) 
-			pageFooterImagePkey = page.footerImage.pkey;
-		$('#page-footer-cont').find('input[value=' + pageFooterImagePkey + ']').check();
-		
-		var pageLeftNavImagePkey = -1;
-		if(page.leftNavImage && page.leftNavImage.pkey) 
-			pageLeftNavImagePkey = page.leftNavImage.pkey;
-		$('#page-leftnav-cont').find('input[value=' + pageLeftNavImagePkey + ']').check();
-		
-		var pageRightNavImagePkey = -1;
-		if(page.rightNavImage && page.rightNavImage.pkey) 
-			pageRightNavImagePkey = page.rightNavImage.pkey;
-		$('#page-rightnav-cont').find('input[value=' + pageRightNavImagePkey + ']').check();
-		
-		setCanvasBackGround( pageScreenImagePkey, pageHeaderImagePkey, pageFooterImagePkey, pageLeftNavImagePkey, pageRightNavImagePkey );
+		// Canvas Cont and Images	
+		$('.canvas-bg-img').attr('src', ' ');
 
-	};
-	
-	
-	function setCanvasBackGround( pageScreenImagePkey, pageHeaderImagePkey, pageFooterImagePkey, pageLeftNavImagePkey, pageRightNavImagePkey ){
+		$('#canvas-screen').attr('src', imageUrlPrefix + page.screenImage.pkey );
 		
-		var pageScreenURL = '<%= request.getContextPath() %>/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=' + pageScreenImagePkey ;
+		if( page.headerImage && page.headerImage.pkey ) {
+			var pageHeaderImagePkey = page.headerImage.pkey;
+			$('#canvas-header').attr('src', imageUrlPrefix + pageHeaderImagePkey);
+			updateSupportingImage({ 'imageType' : 'header', 'imagePkey' : pageHeaderImagePkey });
+		}
 		
-		var pageHeaderURL = '';
-		if(pageHeaderImagePkey && pageHeaderImagePkey != -1)
-			pageHeaderURL = '<%= request.getContextPath() %>/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=' + pageHeaderImagePkey ;
+		if(page.footerImage && page.footerImage.pkey) {
+			var pageFooterImagePkey = page.footerImage.pkey;
+			$('#canvas-footer').attr('src', imageUrlPrefix + pageFooterImagePkey);
+			updateSupportingImage({ 'imageType' : 'footer', 'imagePkey' : pageFooterImagePkey });
+		}
 		
-		var pageFooterURL = '';
-		if(pageFooterImagePkey && pageFooterImagePkey != -1)
-			pageFooterURL = '<%= request.getContextPath() %>/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=' + pageFooterImagePkey ;
+		if(page.leftNavImage && page.leftNavImage.pkey) {
+			var	pageLeftNavImagePkey = page.leftNavImage.pkey;
+			$('#canvas-leftNav').attr('src', imageUrlPrefix + pageLeftNavImagePkey);
+			updateSupportingImage({ 'imageType' : 'leftNav', 'imagePkey' : pageLeftNavImagePkey });
+		}
 		
-		var pageLeftNavURL = '';
-		if(pageLeftNavImagePkey && pageLeftNavImagePkey != -1)
-			pageLeftNavURL = '<%= request.getContextPath() %>/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=' + pageLeftNavImagePkey ;
-		
-		var pageRightNavURL = '';
-		if(pageRightNavImagePkey && pageRightNavImagePkey != -1)
-			pageRightNavURL = '<%= request.getContextPath() %>/image/view?project.pkey=' + projectPkey + '&imageFile.pkey=' + pageRightNavImagePkey ;
-		
-		
-		$('#canvas-screen').attr('src','').attr('src', pageScreenURL).css({'width': projectWidth});
- 		$('#canvas-header').attr('src', pageHeaderURL).css({'width': projectWidth});
-		$('#canvas-footer').attr('src', pageFooterURL).css({'width': projectWidth});
-		$('#canvas-left-nav').attr('src', pageLeftNavURL).css({'height': projectHeight});
-		$('#canvas-right-nav').attr('src', pageRightNavURL).css({'height': projectHeight});
+		if(page.rightNavImage && page.rightNavImage.pkey) {
+			var pageRightNavImagePkey = page.rightNavImage.pkey;
+			$('#canvas-rightNav').attr('src', imageUrlPrefix + pageRightNavImagePkey);
+			updateSupportingImage({ 'imageType' : 'rightNav', 'imagePkey' : pageRightNavImagePkey });
+		}
 		
 	};
-	
 	
 	function loadPageHotSpots(hotSpots) {
-		
-		currentHotSpots = hotSpots;
-		
-		// Clean old hotSpots 
-		var hotSpotsHolder = $('#' + hotSpotsHolderId);
-		hotSpotsHolder.find('.div-hotspot').remove();
-		
-		drawAllHotSpots(currentHotSpots, defFillStyle);
+		if(hotSpots) {
+			// update links			
+			loadPageLinks(hotSpots);
+			
+			// Clean old hotSpots 
+			var hotSpotsHolder = $('#' + hotSpotsHolderId);
+			hotSpotsHolder.find('.div-hotspot').remove();
+			
+			drawAllHotSpots(hotSpots, defFillStyle);
+		}
 	};
 	
+	function loadPageLinks(hotSpots) {
+		if(hotSpots) {
+			
+			var pageLinksList = $('#page-links-list');
+			var pageLinksHtml = '';
+			
+			var pagePkeys = [];
+			var uiEvents;
+			for (var i = 0; i < hotSpots.length; i++) {
+				uiEvents = hotSpots[i].uiEvents;
+				
+				var toPage;
+				for ( var j = 0; j < uiEvents.length; j++) {
+					var uiEvent = uiEvents[j];
+					toPage = uiEvent.toPage;
+					
+					var index = $.inArray(toPage.pkey , pagePkeys);
+					if(index == -1) {
+						pageLinksHtml += '<li onclick="preparePageForEditing(' + toPage.pkey  + ')" pagePkey="' + toPage.pkey + '">';
+						pageLinksHtml += '<label class="page-' + toPage.pkey + '-title">' + toPage.title  + '</label>';
+						pageLinksHtml += '</li>';
+						
+						pagePkeys.push(toPage.pkey);
+					}
+				}
+			}
+			
+			pageLinksList.html(pageLinksHtml);
+		}
+	};
 	
 	function removeHotSpot( hotSpotPkey, element ) {
 		if( hotSpotPkey ){
+			if(hotSpotPkey == 0) {
+				$('#' + hsDivPrefix + hotSpotPkey ).remove();
+				return false;
+			}
+			
 			var currPagePkey = $('#curr-page-pkey').val();
 			var deleteHotSpotUrl = '<%= request.getContextPath() %>/project/build/remove_hot_spot?hotSpot.pkey=' + hotSpotPkey + '&page.pkey=' + currPagePkey ;
 			$.getJSON(deleteHotSpotUrl, function(data){
 				if(data) {
-					$('#tooltip-cont').hide();
-					
-					// update page hotspots ... 
-					updatePageHotSpots();
+// 					updatePageHotSpots(); 
+					$('#' + hsDivPrefix + hotSpotPkey ).remove();
 				}
 			});
 		}
-		
 		return false;
 	};
 	
-	
 	function updatePageHotSpots(){
-		
 		var fetchHotSpotsUrl = '<%= request.getContextPath() %>/project/build/fetch_all_hot_spots?page.pkey=' + currPagePkey ;
 		$.getJSON(fetchHotSpotsUrl, function(data) {
 			if(data) {
-				currentHotSpots = data.hotSpots;
-				loadPageHotSpots(currentHotSpots);
+				loadPageHotSpots(data.hotSpots);
 			}
 		});
-		
 	};
 	
 	function saveHotSpotCoordinates(hotSpot) {
@@ -580,8 +488,7 @@
 				if (!fromX || !toX) return false;
 			},
 			success: function (data){
-				// TODO fix hack 
-// 				updatePageHotSpots();
+
 			}
 		}).trigger('submit');
 	};
@@ -623,21 +530,66 @@
 	
 	/* edit Page title.. */
 	
-	function preparePageTitleEditPopUp(pagePkey, pageTitle) {
+	function preparePageTitleEditPopUp(element, pagePkey) {
 		if(pagePkey == null || pagePkey == '')
 			pagePkey = $('#curr-page-pkey').val();
 		
-		if(pageTitle == null || pageTitle == '')
-			pageTitle = $('#curr-page-title').val();
+		if(pagePkey && pagePkey != '') {
 		
-		// popup 
-		var titleForm = $('#managePageTitleForm');
-		titleForm.find('.curr-page-pkey').attr('value', pagePkey);
-		titleForm.find('.curr-page-title').attr('value', pageTitle);
-		
-		$('#page-title-change-popup-btn').trigger('click');
+			var	pageTitle = $(element).text();
+			if(pageTitle == null || pageTitle == '')
+				pageTitle = $('#curr-page-title').val();
+			
+			// popup 
+			var titleForm = $('#managePageTitleForm');
+			titleForm.find('.curr-page-pkey').attr('value', pagePkey);
+			titleForm.find('.curr-page-title').attr('value', pageTitle);
+			
+			$('#page-title-change-popup-btn').trigger('click');
+			
+		} else {
+			showNotificationMsg('status', "No screen exists");
+			alert('upload screens');
+		}
+
 	};
 	
+	
+	/* replace Page */
+	
+	function preparePageReplace(pagePkey) {
+		if(!pagePkey || pagePkey == '')
+			pagePkey = parseInt($('#curr-page-pkey').val());
+		
+		if(pagePkey && pagePkey != '') {
+			$('#page-screen-input').trigger('click');
+		} else {
+			showNotificationMsg('status', "No screen exists");
+			alert('upload screens');
+		}
+	};
+	
+	
+	/* delete Page */
+	
+	function preparePageDeletePopUp(pagePkey) {
+		if(!pagePkey || pagePkey == '')
+			pagePkey = $('#curr-page-pkey').val();
+		
+		if(pagePkey && pagePkey != '') {
+			
+			// popup 
+			var titleForm = $('#deletePageForm');
+			titleForm.find('.curr-page-pkey').attr('value', pagePkey);
+			
+			$('#page-delete-popup-btn').trigger('click');
+			
+		} else {
+			showNotificationMsg('status', "No screen exists");
+			alert('upload screens');
+		}
+	
+	};
 	
 	
 	
@@ -645,7 +597,7 @@
 	
 	function loadPageComments(comments) {
 		if(comments){
-			
+			// TODO yet to be decided 
 		}
 	};	
 	
@@ -653,25 +605,24 @@
 	
 	// File uploader .. 
 	
-	function openFileSelector( options ) {
-		var uploadForm = $('#upload-imgs-form');
-		var multiFileInput = $('#images-multiple-input');
-		
+	function openFileUploader( options ) {
 		var imageFileType = options.imageFileType;
+		if(!imageFileType || imageFileType == '')
+			imageFileType == 'screen';
 		
+		var uploadForm = $('#upload-imgs-form');
 		uploadForm.find('input.imageFileType').attr('value', imageFileType);
-		multiFileInput.attr('name', imageFileType + 's.fileObj').trigger('click');
 		
-		multiFileInput.live('change', function(event){
-			
-			if (imageFileType == "ScreenImage") {
+		var multiFileInput = $('#images-multiple-input');
+		multiFileInput.attr('name', imageFileType + 's.fileObj').trigger('click');
+		multiFileInput.die('change').live('change', function(event){
+			if (imageFileType == 'screen') {
 				screenImagesUploader(event, this);
 			} else {
 				regularfileUploader(event, this, imageFileType);
 			}
-			
 		});		
-		
+
 	};
 	
 	// Supporting Images Manage 
@@ -679,7 +630,7 @@
 	function openSupportingImageSelector( inElement, inCss ) {
 		if(inElement){
 			var element = $(inElement);
-			var suppImgCont = element.parents('.supp-img-cont');
+			var suppImgCont = element.parents('.supp-img-cont:first');
 			var suppImgs = suppImgCont.find('.tooltip-content');
 			
 			suppImgs.css({
@@ -687,21 +638,52 @@
 				'z-index' : 100,
 			}).css(inCss);
 			
-			$('.tooltip-content').hide('fade');
+			$('.tooltip-content').not(suppImgs).hide('fade');
 			suppImgs.show('fade');
+			
+			// Open file selector if no images are selected .. 
+			var suppImgsCnt = suppImgCont.find('.supporting-images-list:first li').length;
+			if(!suppImgsCnt || suppImgsCnt <= 1) {
+				suppImgCont.find('a.upload-supp-imgs-btn:first').trigger('click');
+			}
+			
 		}
 	};
 	
-	function attachCustomToolTipToCarouselItems() {
-		$('#pages-list li .page-thumb-image-cont').customToolTip({
-			maxWidth : '160px',
-			minWidth : '120px',
-			top : 110,
-			left : 70
-		});
+	function updateSupportingImage(options) {
+		if(options && options.imagePkey && options.imageType) {
+			
+			var imgURL = '';
+			if(options.imagePkey != 0)
+				imgURL = imageUrlPrefix + options.imagePkey ;
+			
+			var form = $('#update-supp-img-form'); 
+			form.find('.img-pkey').attr('value', options.imagePkey);
+			form.find('input[name$=imageType]').attr('value', options.imageType);
+			
+			form.ajaxForm({
+				success: function (data){
+					if(data) {
+						
+						$('#canvas-' + options.imageType ).attr('src', imgURL);
+						
+						// highlight the li 
+						var list = $('.supporting-images-list[imagetype=' + options.imageType + ']');
+						list.find('li').removeClass('selected');
+						
+						var elem = $('#supp-' + options.imageType + '-' + options.imagePkey );
+						elem.addClass('selected');
+
+					}
+				} 			
+			}).trigger('submit');
+
+		
+		}
 	};
 	
-      
+	
+	
 	</script>
 	
 </head>
@@ -738,20 +720,17 @@
 		<div id="top-nav-cont">
 			<ul id="top-btn-list" class="inline-list">
 				<li>
-					<a href="javascript:void(0)" class="btn">
+					<a href="<%= request.getContextPath() %>/project/settings?project.pkey=<s:property value="project.pkey" />&user.emailId=<s:property value="user.emailId"/>" class="btn">
 						<img alt="" src="<%= request.getContextPath() %>/themes/images/icon_settings.png">
 					</a>
 				</li>
-				<!-- 
 				<li>
-	               	<a href="javascript:void(0)" class="btn" > save </a>
-	            </li>
-				 -->
-				<li>
-	              	<a href="javascript:void(0)" class="btn" id="preview-btn" onclick="showPreviewInModal(<s:property value="project.pkey"/>);" > preview </a>
+	              	<a href="javascript:void(0)" class="btn" id="preview-btn" title="preview the project output"
+	              		onclick="showPreviewInModal(<s:property value="project.pkey"/>);" > preview </a>
 				</li>
 				<li>
-	              	<a href="#project-publish-popup" class="btn btn-yellow fancy-box-link" id="publish-btn"> publish </a>
+<!-- 	              	<a href="#project-publish-popup" class="btn btn-yellow fancy-box-link" id="publish-btn"> publish </a> -->
+					<a href="<%= request.getContextPath() %>/project/publish_opts?project.pkey=<s:property value="project.pkey" />&user.emailId=<s:property value="user.emailId"/>" class="btn btn-yellow" id="publish-btn"> publish </a>
 				</li>
 			</ul>
 		</div>
@@ -768,34 +747,29 @@
 			<ul id="pages-list" class="carousel-list">
 				<s:if test="%{pages != null && pages.size() > 0}">
 					<s:iterator value="pages" var="page">
-						<li id="car-page-<s:property value="%{#page.pkey}" />" >
+						<li id="car-page-<s:property value="%{#page.pkey}" />" title="click to edit screen" >
 							
-							<div class="page-thumb-details-cont">
-								<input type="radio" name="landingPagePkey" value="<s:property value="%{#page.pkey}" />" 
-										id="landing-page-radio-<s:property value="%{#page.pkey}" />" onclick="updateProjectLandingPage(this);" />
-								<label for="landing-page-radio-<s:property value="%{#page.pkey}" />" class="landing-page-radio">&nbsp;</label>
-								
-								<a class="page-<s:property value="%{#page.pkey}" />-title auto-ellipses" href="javascript:void(0)" onclick="preparePageTitleEditPopUp(<s:property value="%{#page.pkey}" />, '<s:property value="%{#page.title}" />')"><s:property value="%{#page.title}" /></a>
-							</div>
-													
 							<div class="page-thumb-image-cont">
-
-								<input type="hidden" class="page-pkey" value="<s:property value="%{#page.pkey}" />" />
-								<img alt="<s:property value="%{#page.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#page.screenImage.pkey}" />">
-							
-								<div class="tooltip-content" style="display: none;">
-									<div class="tt-outer left-top">
-										<div class="tt-inner page-tt-content">
-											<ul>
-												<li class="float-fix">
-													<label class="key"> W &nbsp;: &nbsp;</label>
-													<label class=""> <s:property value="%{#page.screenImage.width}" /> px </label>
-												</li>
-												<li class="float-fix">
-													<label class="key"> H &nbsp; : &nbsp;</label>
-													<label class=""> <s:property value="%{#page.screenImage.height}" /> px </label>
-												</li>
-											</ul>
+								
+								<div class="img-cont">
+									<input type="hidden" class="page-pkey" value="<s:property value="%{#page.pkey}" />" />
+									<img alt="<s:property value="%{#page.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#page.screenImage.pkey}" />">
+								</div>
+								
+								<div class="tooltip-content page-tt-content" style="display: none;">
+									<div class="tt-outer">
+										<div class="tt-inner">
+											<div class="float-left">
+												<input type="radio" name="landingPagePkey" value="<s:property value="%{#page.pkey}" />" 
+													id="landing-page-radio-<s:property value="%{#page.pkey}" />" onclick="updateProjectLandingPage(this);" />
+												<label for="landing-page-radio-<s:property value="%{#page.pkey}" />" class="landing-page-radio" >&nbsp;</label>
+											</div>
+											<div class="float-right">
+												<a href="javascript:void(0)" onclick="preparePageDeletePopUp(<s:property value="%{#page.pkey}" />)" class="delete-page-icon float-right" >&nbsp;</a>
+											</div>
+											<div class="pos-abs thumb-details-cont">
+												<a class="page-<s:property value="%{#page.pkey}" />-title auto-ellipses" href="javascript:void(0)" onclick="preparePageTitleEditPopUp(this, <s:property value="%{#page.pkey}" />)"><s:property value="%{#page.title}" /></a>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -808,33 +782,48 @@
 			</ul>
 			<s:else>
 				<div id="no-pages-cont">
-					<a class="plus-icon" onclick="openFileSelector({'imageFileType':'ScreenImage'});" 
-						href="javascript:void(0);" > Add Screens here </a>
-					<label class="clear gray-999-text"> or </label>
-					<label class="clear gray-666-text"> drop them here </label>
+					<a href="javascript:void(0);" class="plus-icon float-left" title="click to upload screen images" 
+						onclick="openFileUploader({'imageFileType':'screen'});" > Upload Screens </a>
+					<label class=""> or drop them here</label>
 				</div>
 			</s:else>
 			
 		</div>
 			
 		<div id="build-nav-cont" class="">
-			<div id="page-title-cont" class="float-left">
-<!-- 				<a class="curr-page-title fancy-box-link float-left margin-5px " title="Click to rename" href="#page-title-change-popup"> Page Title </a> -->
-				<a class="curr-page-title float-left margin-5px " title="Click to rename" href="javascript:void(0)" onclick="preparePageTitleEditPopUp()"> Page Title </a>
+			<div id="page-title-cont" class="float-left" style="padding: 1px 15px;">
+				<a href="javascript:void(0)" class="curr-page-title float-left margin-5px " title="click to rename the screen" 
+					onclick="preparePageTitleEditPopUp(this)"> Page Title </a>
 			</div>
+			
+			<div id="notification-cont" style="display: none;">
+				<div id="notification-box" class="error">
+<!-- 					<a href="javascript:void" class="float-left skull-icon-white" id="noification-icon"></a> -->
+					<span class="msg-text"> Something Went Wrong !!! </span>
+<!-- 					<a href="javascript:void(0);" class="float-right close-icon-white" id="noification-close"></a> -->
+				</div>
+			</div>
+			
 			<div id="page-options-cont" class="float-right">
 				<ul id="page-options-list" class="inline-list">
+					
 					<li id="" class="">
-						<a href="javascript:void(0)" class="screen-icon" id="page-screen-btn">&nbsp;</a>
+						<a href="javascript:void(0)" class="screen-icon" title="replace the current screen image"
+							id="page-screen-btn" onclick="preparePageReplace();"> replace </a>
 					</li>
 					<li id="" class="">
-						<a href="#page-delete-popup" class="delete-icon fancy-box-link" id="page-delete-btn">&nbsp;</a>
-					</li>
-					<li class="">
-						<a href="javascript:void(0)" class="hotspots-icon screen-hotspots-count" onclick="showHideAllHotSpots( this );">&nbsp;</a>
+						<a href="javascript:void(0)" class="bin-icon" title="delete the screen completely"
+							id="page-delete-btn" onclick="preparePageDeletePopUp();"> delete </a>
 					</li>
 					
-					<li class="" style="border-left: 1px dotted #000000;">
+					<li class="separator">|</li>
+					
+					<li id="" class="">
+						<a href="javascript:void(0);" class="upload-icon" title="upload more screen images" 
+							onclick="openFileUploader({'imageFileType':'screen'});" > upload </a>
+					</li>
+					
+					<li class="" >
 						<a class="collapse-icon">&nbsp;</a>
 					</li>
 				</ul>
@@ -845,54 +834,47 @@
 	
 	<div id="main-cont" style="display: none;">
 	
-		<div id="notification-cont" style="display: none;">
-			<div id="notification-box" class="error">
-				<a href="javascript:void" class="float-left skull-icon-white" id="noification-icon"></a>
-				<span class="msg-text"> Something Went Wrong !!! </span>
-				<a href="javascript:void(0);" class="float-right close-icon-white" id="noification-close"></a>
-			</div>
-		</div>
-		
 		<section id="build-left-cont" >
 			
 			<div id="page-header-cont" class="supp-img-cont">
 				<div class="pos-rel">
 				
 					<a class="float-right bold tooltip-header" href="javascript:void(0)"  
-						onclick="openSupportingImageSelector(this, {'top' : '25px', 'right' : '0px'})"> + add header </a>
+						onclick="openSupportingImageSelector(this, {'top' : '25px', 'right' : '0px'})"> + choose header </a>
 					
-					<div class="tooltip-content" style="display: none;">
-						<div class="tt-outer left-top">
-							<div class="tt-inner supp-img-tt-content">
-						
-								<div class="float-fix"> <a href="javascript:void(0)" class="float-right close-tt">X</a> </div>
-								<ul class="supporting-images-list" imageType="Header">
-									<li>
-										<input type="radio" name="Header-image-radio" value="-1" id="supp-img-header-none" >
-										<label for="supp-img-header-none"> None </label>
+					<div class="tooltip-content supp-img-tt-content" style="display: none;">
+						<div class="tt-outer top-right">
+							<div class="tt-inner">
+								<ul class="supporting-images-list" imageType="header">
+									<li id="supp-header-0" class="selected">
+										<a href="javascript:void(0);" class="supp-img-label"
+											onclick="updateSupportingImage({'imagePkey':'0', 'imageType':'header'});"> No Header </a>
+										
 									</li>
 									<s:iterator value="headerImages" var="image">
-										<li>
-											<input type="radio" name="Header-image-radio" value="<s:property value="%{#image.pkey}" />" id="supp-img-<s:property value="%{#image.pkey}" />" >
-											<label for="supp-img-<s:property value="%{#image.pkey}" />"><s:property value="%{#image.fileObjFileName}" /></label>
+										<li id="supp-header-<s:property value="%{#image.pkey}" />">
+											<a href="javascript:void(0);" class="supp-img-label"
+												onclick="updateSupportingImage({'imagePkey':'<s:property value="%{#image.pkey}" />', 'imageType':'header'});">
+												<s:property value="%{#image.fileObjFileName}" />
+											</a>
 											
 											<form class="delete-support-image-form" action="<%= request.getContextPath() %>/image/remove" method="post">
 												<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
-												<input type="hidden" name="imageFile.imageType" value="Header" class="">
+												<input type="hidden" name="imageFile.imageType" value="header" class="">
 												<input type="hidden" name="imageFile.pkey" class="support-img-pkey" value="<s:property value="%{#image.pkey}" />">
 												
-												<a class="float-right delete-support-image-btn close-icon" href="javascript:void(0);">&nbsp;</a>
+												<a class="float-right delete-support-image-btn bin-icon" href="javascript:void(0);">&nbsp;</a>
 											</form>
 										</li>
 									</s:iterator>
 								</ul>
-								<a class="plus-icon float-left clear margin-5px bold" href="javascript:void(0);" 
-									onclick="openFileSelector({'imageFileType':'Header'});"> upload more images </a>
+								<a class="plus-icon upload-supp-imgs-btn" href="javascript:void(0);" 
+									onclick="openFileUploader({'imageFileType':'header'});"> upload headers </a>
 							
 							</div>
 						</div>
 					</div>
-				
+
 				</div>
 			</div>
 			
@@ -900,35 +882,36 @@
 				<div class="pos-rel">
 			
 					<a href="javascript:void(0)" class="float-right bold tooltip-header"
-						onclick="openSupportingImageSelector(this, {'bottom' : '10px', 'right' : '0px'})"> + add footer </a>
+						onclick="openSupportingImageSelector(this, {'bottom' : '10px', 'right' : '0px'})"> + choose footer </a>
 					
-					<div class="tooltip-content" style="display: none;">
-						<div class="tt-outer left-top">
-							<div class="tt-inner supp-img-tt-content">
-					
-								<div class="float-fix"> <a href="javascript:void(0)" class="float-right close-tt">X</a> </div>
-								<ul class="supporting-images-list" imageType="Footer">
-									<li>
-										<input type="radio" name="Footer-image-radio" value="-1" id="supp-img-footer-none" >
-										<label for="supp-img-footer-none"> None </label>
+					<div class="tooltip-content supp-img-tt-content" style="display: none;">
+						<div class="tt-outer bottom-right">
+							<div class="tt-inner">
+								<ul class="supporting-images-list" imageType="footer">
+									<li id="supp-footer-0" class="selected">
+										<a href="javascript:void(0);" class="supp-img-label"
+											onclick="updateSupportingImage({'imagePkey':'0', 'imageType':'footer'});"> No Footer </a>
 									</li>
 									<s:iterator value="footerImages" var="image">
-										<li>
-											<input type="radio" name="Footer-image-radio" value="<s:property value="%{#image.pkey}" />" id="supp-img-<s:property value="%{#image.pkey}" />" >
-											<label for="supp-img-<s:property value="%{#image.pkey}" />"><s:property value="%{#image.fileObjFileName}" /></label>
+										<li id="supp-footer-<s:property value="%{#image.pkey}" />">
 											
+											<a href="javascript:void(0);" class="supp-img-label"
+												onclick="updateSupportingImage({'imagePkey':'<s:property value="%{#image.pkey}" />', 'imageType':'footer'});">
+												<s:property value="%{#image.fileObjFileName}" />
+											</a>
+											 
 											<form class="delete-support-image-form" action="<%= request.getContextPath() %>/image/remove" method="post">
 												<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
-												<input type="hidden" name="imageFile.imageType" value="Footer" class="">
+												<input type="hidden" name="imageFile.imageType" value="footer" class="">
 												<input type="hidden" name="imageFile.pkey" class="support-img-pkey" value="<s:property value="%{#image.pkey}" />">
 												
-												<a class="float-right delete-support-image-btn close-icon" href="javascript:void(0);">&nbsp;</a>
+												<a class="float-right delete-support-image-btn bin-icon" href="javascript:void(0);">&nbsp;</a>
 											</form>
 										</li>
 									</s:iterator>
 								</ul>
-								<a class="plus-icon float-left clear margin-5px bold" href="javascript:void(0);" 
-									onclick="openFileSelector({'imageFileType':'Footer'});"> upload more images </a>
+								<a class="plus-icon upload-supp-imgs-btn" href="javascript:void(0);" 
+									onclick="openFileUploader({'imageFileType':'footer'});"> upload footers </a>
 							
 							</div>
 						</div>
@@ -940,19 +923,15 @@
 			<s:if test="%{#projType != null && #projType != '' }">
 				<s:if test="%{#projType != 'AndroidMobile' && #projType != 'Iphone3' && #projType == 'Iphone4'}">
 					
-					<div id="page-leftnav-cont" class="supp-img-cont">
+					<div id="page-leftNav-cont" class="supp-img-cont">
 						<div class="pos-rel">
-							
 							<!-- Yet to Come -->
-						
 						</div>
 					</div>
 					
-					<div id="page-rightnav-cont" class="supp-img-cont">
+					<div id="page-rightNav-cont" class="supp-img-cont">
 						<div class="pos-rel">
-							
 							<!-- Yet to Come -->
-						
 						</div>
 					</div>
 					
@@ -964,11 +943,11 @@
 		<section id="build-cont" class="">
 	
 			<div id="screen-imgs-cont" class="">
-				<img alt="" src="" id="canvas-screen" class="canvas-bg-img">
-				<img alt="" src="" id="canvas-header" class="canvas-bg-img">
-				<img alt="" src="" id="canvas-footer" class="canvas-bg-img">
-				<img alt="" src="" id="canvas-left-nav" class="canvas-bg-img">
-				<img alt="" src="" id="canvas-right-nav" class="canvas-bg-img">
+				<img alt="" src="" id="canvas-screen" class="canvas-bg-img scaled-width">
+				<img alt="" src="" id="canvas-header" class="canvas-bg-img scaled-width">
+				<img alt="" src="" id="canvas-footer" class="canvas-bg-img scaled-width">
+				<img alt="" src="" id="canvas-leftNav" class="canvas-bg-img scaled-height">
+				<img alt="" src="" id="canvas-rightNav" class="canvas-bg-img scaled-height">
 			</div>
 			
 			<div id="hotspots-cont" class="">
@@ -983,7 +962,21 @@
 		</section>
 		
 		<section id="build-right-cont" >
-		
+			
+			<div id="" class="float-fix" style="margin: 50px 5px 20px 5px;">
+				<a href="javascript:void(0)" class="hotspots-icon" title="toggle hot-spots visibility" 
+					onclick="showHideAllHotSpots(this);"> HotSpots : <span class="screen-hotspots-count"> 0 </span> </a>
+			</div>
+			
+			<div id="" class="float-fix margin-5px">
+				<label class="bold" style="line-height: 20px; font-size: 14px; display: block;"> screens linked to </label>
+				
+				<!-- page links -->
+				<ul id="page-links-list">
+				
+				</ul>
+			</div>
+
 		</section>
 		
 		<div class="clear-float"></div>
@@ -1045,7 +1038,7 @@
 			<form id="update-supp-img-form" action="<%= request.getContextPath() %>/project/build/save_page" method="post">
 				<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
 				<input type="hidden" name="page.pkey" value="<s:property value="page.pkey" />" class="curr-page-pkey">
-				<input type="hidden" name="imageFile.imageType" value="Header" class="">
+				<input type="hidden" name="imageFile.imageType" value="header" class="">
 				<input type="hidden" name="imageFile.pkey" class="img-pkey" value="">		
 			</form>
 		</div>
@@ -1057,6 +1050,7 @@
 	<section class="pop-ups-cont" style="display: none;">
 	
 		<!-- Page Title Change pop-up -->
+		
 		<a class="fancy-box-link" href="#page-title-change-popup" id="page-title-change-popup-btn">&nbsp;</a>
 		
 		<div id="page-title-change-popup" class="pop-up">
@@ -1068,7 +1062,7 @@
 					<label class="pu-title"> Rename Page </label>
 				</div>
 				<div class="margin-5px float-fix" style="padding: 5px 0;">
-					<input type="text" name="page.title" class="curr-page-title float-left" value="" placeholder="Page title" />
+					<input type="text" name="page.title" class="curr-page-title float-left mandatory" value="" placeholder="Page title" />
 				</div>
 				<div class="pu-footer float-fix" style="padding-top: 25px">
 					<div class="btn-cont float-right">
@@ -1082,6 +1076,8 @@
 
 		<!-- Page Delete pop-up -->
 
+		<a class="fancy-box-link" href="#page-delete-popup" id="page-delete-popup-btn">&nbsp;</a>
+
 		<div id="page-delete-popup" class="pop-up">
 			<form id="deletePageForm" action="<%= request.getContextPath() %>/project/build/remove_page" method="post">
 									
@@ -1091,8 +1087,8 @@
 				<div class="pu-header float-fix">
 					<label class="pu-title float-left"> Are You Sure ? </label>
 				</div>
-				<div class="pu-body float-fix">
-					<label class="pu-title float-left"> Deleting a Page will delete all its Hotspots, Images and other settings </label>
+				<div class="float-fix">
+					<label class="bold"> Deleting a Page will delete all its Hotspots, Images and other settings </label>
 				</div>
 				<div class="pu-footer float-fix" style="padding-top: 25px">
 					<div class="btn-cont float-right">
@@ -1103,197 +1099,12 @@
 			</form>
 		</div>
 		
-		
 		<!-- Project Preview Container -->
-		
 		<a href="#project-preview-popup" id="preview-popup-link" class="fancy-box-link"> </a>
+		<%@ include file="include_preview_popup.jsp" %>
 		
-		<div id="project-preview-popup" class="pop-up">
-			<div id="preview-cont">
-				<iframe src="" id="preview-iframe"> 
-					<p> Oooops ... , your browser currently doesn't support IFrames .. !!!</p>
-					<p> Supported browsers: <a href="http://www.opera.com">Opera</a>, <a href="http://www.mozilla.com">Firefox</a>, <a href="http://www.apple.com/safari">Safari</a>, and <a href="http://www.konqueror.org">Konqueror</a>. </p>
-				</iframe>
-			</div>
-			
-			<script type="text/javascript">
-
-			/* Project Preview */
-
-			function showPreviewInModal(projectPkey, layoutWidth, layoutHeight){
-				
-				if (!layoutWidth) layoutWidth = $('#proj-width').val();
-				if (!layoutHeight) layoutHeight = $('#proj-height').val();
-				
-				var previewUrl = '<%=request.getContextPath()%>/publish/preview?project.pkey=' + projectPkey ;
-				
-				var landingPagePkey = $('#landing-page-pkey').val();
-				if(landingPagePkey && landingPagePkey != '')
-					previewUrl += '#page-' + landingPagePkey ;
-				
-				// Fancybox ... 
-				var previewCont = $('#preview-cont');
-				previewCont.find('iframe').attr('src', previewUrl );
-				
-				$('#preview-popup-link').trigger('click');	
-				
-			};
-			
-			</script>
-			
-		</div>
-		
-		
-		
-		<!-- Project Publish pop-up -->
-		
-		<div id="project-publish-popup" class="pop-up">
-				
-			<div class="pu-header float-fix">
-				<label class="pu-title"> <s:property value="project.title" /> </label>
-			</div>
-			
-			<div class="pu-body float-fix">
-				<div class="msg-cont">
-				
-				</div>
-				<div class="pu-content float-fix">
-				
-					<form id="projectPublishForm" action="<%= request.getContextPath() %>/publish/manage_details" method="post">
-				
-						<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
-						<input type="hidden" name="publishDetails.pkey" value="<s:property value="publishDetails.pkey" />">
-
-						<div id="publish-msg-cont" class="float-left padding-5px">
-							
-							<label class="clear gray-999-text"> Project Name : </label>
-							<label class="clear gray-333-text"> <s:property value="project.title" /> </label>
-							
-							<label class="clear gray-999-text" style="margin-top: 15px;"> Notes to the Users : </label>
-							<textarea name="project.description" rows="" cols="" class="float-left clear inp-box inner-shadow" placeholder="Project description" > <s:property value="project.description"/> </textarea>
-							
-							<%-- 
-							<label class="clear gray-999-text" style="margin-top: 15px;"> Pass key : </label>
-							<input name="publishDetails.passKey" class="float-left clear inp-box inner-shadow" value="<s:property value="publishDetails.passKey" />" placeholder="optional" />
-							 --%>
-							
-						</div>
-						
-						<div id="publish-users-cont" class="float-left padding-5px">
-						
-							<div id="publish-visibility" class="float-fix">
-								<input type="radio" name="" value="true" id="visible-public" checked="checked" class="isPublic">
-								<label for="visible-public">Public</label>
-								<input type="radio" name="" value="false" id="visible-private" class="isPublic">
-								<label for="visible-private">Private</label>
-								
-								<input type="hidden" name="project.isPublic" value="true">
-							</div>
-							
-							<div id="publish-public-note">
-								<label>Public</label>
-							</div>
-						
-							<div id="publish-contacts-cont" style="display: none;">
-							
-								<label class="clear gray-999-text"> Add user email-ids : </label>
-							 	
-							 	<ul class="clear" id="app-users-list">
-							 	
-							 		<s:iterator value="appUsers" var="appUser" status="idx">
-							 			
-							 			<li>
-							 			
-	<%-- 						 				<s:if test="%{#appUser.pkey != null && #appUser.name != '' }"> --%>
-	<%-- 						 					<label><s:property value="%{#appUser.name}" /></label> --%>
-	<%-- 						 				</s:if> --%>
-	<%-- 						 				<s:else> --%>
-							 					<label><s:property value="%{#appUser.emailId}" /></label>
-	<%-- 						 				</s:else> --%>
-	
-											<s:if test="%{#appUser.isPublisher != true }">
-							 					<a href="javascript:void(0);" class="bin-icon float-right" ></a>
-							 				</s:if>
-							 				<s:else>
-							 					<span class="float-right"> Yourself </span>
-							 				</s:else>
-							 				
-							 				<input type="hidden" name="appUsers[<s:property value="%{#idx.index}" />].emailId" value="<s:property value="%{#appUser.emailId}" />">
-							 				<input type="hidden" name="appUsers[<s:property value="%{#idx.index}" />].pkey" value="<s:property value="%{#appUser.pkey}" />">
-							 			
-							 			</li>
-	
-								    </s:iterator> 
-	
-							 	</ul>
-							
-								<div class="float-right float-fix">
-									<input type="text" class="inp-box inner-shadow " placeholder="Enter user(s) email-id(s) to invite" id="add-app-user-input">
-									<a id="add-app-user-btn" href="javascript:void(0);"> + Add </a>
-								</div>
-						
-							</div>
-							
-						</div>
-					</form>
-					
-				</div>
-			</div>
-			<div class="pu-footer float-fix">
-				<div class="btn-cont float-right no-margin no-padding">
-					<input type="button" value="Publish Project" id="publish-proj-btn" class="btn btn-yellow">
-				</div>
-			</div>
-		
-		</div>
-		
-		<script type="text/javascript">
-		
-			$(document).ready( function() {
-				
-				var projectPublishPopUp = $('#project-publish-popup');
-				// Project Publishing ...
-				
-				$('#add-app-user-btn').live('click', function(){
-					
-					var appUserHtml = '';
-					
-					var appUserInput = $('#add-app-user-input');
-					var appUserEmailId = appUserInput.val();
-
-					if (appUserEmailId) {
-						appUserHtml += '<li>';
-						appUserHtml += '<label>' + appUserEmailId + '</label>';
-						appUserHtml += '<a href="javascript:void(0);" class="bin-icon float-right" ></a>';
-						appUserHtml += '<input type="hidden" name="appUsers.emailId" value="' + appUserEmailId + '">';
-						appUserHtml += '</li>';
-					}
-					
-					$('#app-users-list').append(appUserHtml);				
-					appUserInput.val('');
-					
-				});
-				
-				$('#app-users-list .bin-icon').live('click', function(){
-					$(this).parents('li').remove();	
-				});
-				
-				$('#publish-proj-btn').live('click', function(){
-					$('#projectPublishForm').ajaxForm({
-						beforeSubmit: function (data){},
-						success: function (data){
-							// re load the publish details 
-						},
-						complete: function(){
-							$.fancybox.close();
-						}
-					}).trigger('submit');
-				});
-				
-			});
-		
-		</script>
-		
+		<!-- Publish Pop Up -->
+		<%@ include file="include_publish_popup.jsp" %>
 		
 	</section>
 	
@@ -1301,6 +1112,7 @@
 			
 		<form id="hotSpotCreateEditForm" action="<%= request.getContextPath() %>/project/build/save_hot_spot" method="post" >
 
+			<%-- 
 			<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />" >
 			<input type="hidden" name="page.pkey" value="<s:property value="page.pkey" />" class="curr-page-pkey">
 			
@@ -1310,21 +1122,21 @@
 			<input type="hidden" name="hotSpot.fromY" value="" >
 			<input type="hidden" name="hotSpot.toX" value="" >
 			<input type="hidden" name="hotSpot.toY" value="" >
+			 --%>
 
 			<ul id="events-list" class="float-fix">
-				
+
 				<li class="" id="events-li">
-					
 					<div class="new-event-div" index="0">
 					
 						<input type="hidden" name="uiEvents[0].pkey" value="" class="ui-event-pkey"> 
-						<a href="javascript:void(0);" class="bin-icon margin-5px float-right" style="display: none;"></a>
+						<a href="javascript:void(0);" class="delete-uiEvent-btn bin-icon margin-5px float-right" style="display: none;"></a>
 						
 						<ul class="new-event-list" >
 							<li class="">
 								<label class="">on </label>
 								<select name="uiEvents[0].eventType" class="mandatory short">
-									<option value="-1"> - event - </option>
+									<option value="0"> - event - </option>
 									<option value="tap">Tap</option>
 									<option value="taphold">Taphold</option>
 									<option value="swipe">Swipe</option>
@@ -1335,7 +1147,7 @@
 							<li class="">
 								<label class="">go to </label>
 								<select name="uiEvents[0].toPage.pkey" class="mandatory short">
-									<option value="-1"> - page - </option>
+									<option value="0"> - page - </option>
 									<s:iterator value="pages" var="page">
 										<option value="<s:property value="%{#page.pkey}" />" class="page-<s:property value="%{#page.pkey}" />-title auto-ellipses"> <s:property value="%{#page.title}" /> </option>
 								    </s:iterator> 
@@ -1344,7 +1156,7 @@
 							<li class="">
 								<label class="">with </label>
 								<select name="uiEvents[0].transitionType" class="mandatory short">
-									<option value="-1"> - transition - </option>
+									<option value="0"> - transition - </option>
 									<option value="fade">Fade</option>
 									<option value="pop">Pop</option>
 									<option value="flip">Flip</option>
@@ -1361,78 +1173,31 @@
 						
 					</div>
 				</li>
-				
+
+				<!-- 
 				<li>
 					<div class="margin-5px">
 						<a href="javascript:void(0);" class="plus-icon bold margin-5px" id="add-more-events-btn" > Add new Interaction </a>
 					</div>
 				</li>
-				
 				<li class="no-border margin-5px" id="">
 					<label class="bold"> Title </label>
 					<input type="text" name="hotSpot.title" value="" placeholder="name it for easy recognition" class="">
 				</li>
-				
 				<li class="no-border margin-5px" id="">
 					<label class="bold"> Notes </label>
 					<textarea name="hotSpot.description" placeholder="what is this?" class=""></textarea>
 				</li>
-				
 				<li class="no-border margin-5px">
 					<input type="submit" class="float-right btn" value="done" id="save-hotspot-btn" />
 					<input type="button" class="float-right btn" value="cancel" id="cancel-hotspot-btn" />
 				</li>
+				 -->
+
 			</ul>
-			
+
 		</form>
-			
-		<script type="text/javascript">
-			$(document).ready( function() {
-				
-				$('.add-more-events-btn').live('click',function() {
-					var eventsList = $(this).parents('.events-list:first');
-					
-					var lastEventDiv = eventsList.find('.new-event-div:last');
-					var newIndex = parseInt(lastEventDiv.attr('index')) + 1;
-					
-					var eventHtml = prepareUiEventHtml(null, newIndex);
-					eventsList.prepend('<li>' + eventHtml + '</li>');
-					
-					setBinIcons(eventsList);
-				});
-				
-				$('.new-event-div .bin-icon').live('click', function() {
-					var eventDiv = $(this).parents('.new-event-div:first');
-					
-					var eventPkey = eventDiv.find('.ui-event-pkey').val();
-					if(eventPkey && eventPkey != ''){
-						var deleteEventPkey = '<%= request.getContextPath() %>/project/build/remove_ui_event?page.pkey=' + currPagePkey + '&uiEvent.pkey=' + eventPkey ;   
-						$.getJSON(deleteEventPkey, function(data) {
-							if(data) {
-								updatePageHotSpots();
-								eventDiv.remove();
-							}
-						});
-					} else {
-						eventDiv.remove();
-					}
-					
-					setBinIcons();
-				});
-				
-				function setBinIcons(eventsList) {
-					if(eventsList) {
-						var binIcons = eventsList.find('.bin-icon');
-						binIcons.hide();
-						if(binIcons && binIcons.length > 1){
-							binIcons.show();
-						}
-					}
-				};
-				
-			});
-		</script >
-					
+
 	</section>
 
 </body>

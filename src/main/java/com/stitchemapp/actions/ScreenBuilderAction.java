@@ -115,7 +115,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
         
         String imageFile_pkey = this.request.getParameter("imageFile.pkey");
         if (imageFile_pkey != null && StringUtils.isNotEmpty(imageFile_pkey)){
-        	if(Integer.valueOf(imageFile_pkey) != -1){
+        	if(Integer.valueOf(imageFile_pkey) != 0){
         		imageFile = screenBuilderService.readImageFile(Integer.valueOf(imageFile_pkey));
         	} else {
         		imageFile = null;
@@ -159,7 +159,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
 					imageFile.setWidth(image.getWidth());
 					imageFile.setHeight(image.getHeight());
 					
-					if (imageFile.getImageType().equals(ImageFileType.ScreenImage) && image.getWidth() < project.getProjectType().width()) {
+					if (imageFile.getImageType().equals(ImageFileType.screen) && image.getWidth() < project.getProjectType().width()) {
 						// TODO throw Image Dimension Error Message
 						messageBean.setMessageType(MessageType.error);
 						messageBean.setMessage(Messages.INVALID_DIMENSIONS);
@@ -173,7 +173,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
 					screenBuilderService.storeProjectImageFile(project, imageFile);
 				}
 				
-				if(imageFile.getImageType().equals(ImageFileType.ScreenImage))
+				if(imageFile.getImageType().equals(ImageFileType.screen))
 					page = screenBuilderService.createPageForProjectScreenImage(project, imageFile);
 				
 			} else {
@@ -271,7 +271,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
 		
 		if(page != null && imageFile != null){
 			
-			imageFile.setImageType(ImageFileType.ScreenImage);
+			imageFile.setImageType(ImageFileType.screen);
 			screenBuilderService.storeProjectImageFile(project, imageFile);
 			page = screenBuilderService.readPage(page.getPkey());
 			
@@ -362,10 +362,10 @@ public class ScreenBuilderAction extends GenericActionSupport {
 	
 	public String savePage() {
 		
-		if(page != null){
+		if(page != null && !page.getTitle().isEmpty() ){
 						
 			if (page.getPkey() != null ){
-				
+
 				// Setting Image file : logic works for all images except screen Image update ..
 				if (imageFile != null) {
 					screenBuilderService.updatePage(page, imageFile);

@@ -1,0 +1,14 @@
+
+<li id="supp-<%= imageType %>-<%= pkey %>">
+	<a class="supp-img-label" href="javascript:void(0);" onclick="updateSupportingImage({'imagePkey':'<%= pkey %>', 'imageType':'<%= imageType %>'});" >
+		<%= fileObjFileName %>
+	</a>
+
+	<form method="post" action="<%= contextPath %>/image/remove" class="delete-support-image-form">
+		<input type="hidden" value="<%= projectPkey %>" name="project.pkey">
+		<input type="hidden" value="<%= imageType %>" name="imageFile.imageType">
+		<input type="hidden" value="<%= pkey %>" class="support-img-pkey" name="imageFile.pkey">
+
+		<a href="javascript:void(0);" class="float-right delete-support-image-btn bin-icon">&nbsp;</a>
+	</form>
+</li>

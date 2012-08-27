@@ -1,0 +1,31 @@
+
+<div class="page-thumb-image-cont">
+	
+	<div class="img-cont">
+		<input type="hidden" class="page-pkey" value="<%= pkey %>" />
+		<img alt="screen thumbnail" src="<%= contextPath %>/image/view?project.pkey=<%= projectPkey %>&imageFile.pkey=<%= screenImage.pkey %>">
+	</div>
+	
+	<div class="tooltip-content page-tt-content" style="display: none;">
+		<div class="tt-outer">
+			<div class="tt-inner">
+			
+				<div class="float-left">
+					<input type="radio" name="landingPagePkey" value="<%= pkey %>" 
+						id="landing-page-radio-<%= pkey %>" onclick="updateProjectLandingPage(this);" />
+					<label for="landing-page-radio-<%= pkey %>" class="landing-page-radio" >&nbsp;</label>
+				</div>
+				<div class="float-right">
+					<a href="javascript:void(0)" onclick="preparePageDeletePopUp(<%= pkey %>)" class="delete-page-icon float-right" >&nbsp;</a>
+				</div>
+				<div class="pos-abs thumb-details-cont">
+					<a class="page-<%= pkey %>-title auto-ellipses" href="javascript:void(0)" 
+						onclick="preparePageTitleEditPopUp(this, <%= pkey %>)"><%= title %></a>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	
+</div>
+	

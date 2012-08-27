@@ -11,6 +11,7 @@ import com.stitchemapp.entities.Comment;
 import com.stitchemapp.entities.Layout;
 import com.stitchemapp.entities.Page;
 import com.stitchemapp.entities.Project;
+import com.stitchemapp.entities.PublishDetails;
 import com.stitchemapp.entities.Tag;
 import com.stitchemapp.entities.User;
 import com.stitchemapp.services.ContentService;
@@ -30,6 +31,7 @@ public class ProjectAction extends GenericActionSupport {
 	
 	private Project project;
 	private Layout layout;
+	private PublishDetails publishDetails;
 	
 	private Page page;
 	private List<Page> pages;
@@ -114,22 +116,23 @@ public class ProjectAction extends GenericActionSupport {
 	}
 	
 	
-	public String prepareProjectForEdit(){
+	public String prepareProjectSettings(){
 		
 		// Implementing Authorisation ..
-		if(!super.authorizeUserProject(project))
-			return ERROR;
+//		if(!super.authorizeUserProject(project))
+//			return ERROR;
 		
-		if (project != null && project.getPkey() != null ) {
+		if (project != null) {
+			this.saveProject();
 			// prepare will read the project
 //			project = projectManager.readProject(project.getPkey());
 			
 			layout = project.getLayout();
 			pages = layout.getPages();
 		} 
-		
+
 		return SUCCESS;
-	
+
 	}
 
 	public String saveProject(){
@@ -164,15 +167,19 @@ public class ProjectAction extends GenericActionSupport {
 	
 	}
 	
+	public String prepareProjectPublishDetails() {
+		if (project != null) {
+			publishDetails = project.getPublishDetails();
+		}
+		return SUCCESS;
+	}
+	
 	
 	public String deleteProject() {
-		
 		if (project != null && project.getPkey() != null) {
 			projectService.deleteProject(project);
 		}
-		
 		return SUCCESS;
-
 	}
 	
 	
@@ -268,6 +275,14 @@ public class ProjectAction extends GenericActionSupport {
 		this.layout = layout;
 	}
 
+	public PublishDetails getPublishDetails() {
+		return publishDetails;
+	}
+
+	public void setPublishDetails(PublishDetails publishDetails) {
+		this.publishDetails = publishDetails;
+	}
+
 	public Page getPage() {
 		return page;
 	}
@@ -277,7 +292,7 @@ public class ProjectAction extends GenericActionSupport {
 	}
 
 	public List<Page> getPages() {
-	return pages;
+		return pages;
 	}
 
 	public void setPages(List<Page> pages) {

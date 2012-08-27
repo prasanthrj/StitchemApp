@@ -1,0 +1,44 @@
+
+<div class="pos-rel">
+	<div class="tooltip-content tt-outer left-top" style="display: none;">
+		<div class="tt-inner hs-tt-content">
+				
+			<form class="hotSpotCreateEditForm" method="post">
+				<input type="hidden" value="<%= projectPkey %>" name="project.pkey" value="" >
+				<input type="hidden" value="<%= currPagePkey %>" name="page.pkey" value="">
+				
+				<% if(pkey && pkey != '' && pkey != 0) { %>
+					<input type="hidden" value="<%= pkey %>" name="hotSpot.pkey" />
+			    <% } %>
+		
+				<input type="hidden" value="<%= fromX %>" name="hotSpot.fromX" />
+				<input type="hidden" value="<%= fromY %>" name="hotSpot.fromY" />
+				<input type="hidden" value="<%= toX %>" name="hotSpot.toX" />
+				<input type="hidden" value="<%= toY %>" name="hotSpot.toY" />
+		
+				<ul class="events-list">
+				
+					<% if(uiEvents) { %>
+						<% var uiEventHtml = ''; %>
+						<% if(uiEvents.length > 0) { %>
+							<% for ( var i = 0; i < uiEvents.length; i++) { %>
+								<% uiEventHtml += prepareUiEventHtml(uiEvents[i], i) %>
+							<% } %>
+						<% } else { %>
+							<% uiEventHtml += prepareUiEventHtml({}, 0) %>
+						<% } %>
+						<%= uiEventHtml %>
+					<% } %>
+					
+					<li>
+						<div class="float-fix">
+							<a href="javascript:void(0);" class="plus-icon bold margin-5px float-left add-more-events-btn" > add new Interaction </a>
+							<a href="javascript:void(0);" class="bin-icon bold margin-5px float-right hs-delete-btn" hot-spot-pkey="<%= pkey %>"> delete </a>
+						</div>
+					</li>
+				</ul>
+			</form>
+
+		</div>
+	</div>
+</div>

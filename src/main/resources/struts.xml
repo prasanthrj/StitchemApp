@@ -130,6 +130,7 @@
 	
 	<package name="project" namespace="/project" extends="json-default">
 		
+		<!-- 
 		<action name="info" class="projectAction" method="prepareProjectInfo">
 			<result name="success" type="json">
 				<param name="includeProperties"> projectBean.* </param>
@@ -138,17 +139,14 @@
                 </param>
 			</result>
 		</action>
-		
+		 -->
+		 
 		<action name="view" class="projectAction" method="prepareProjectView">
 			<result name="success">/pages/project/project_view.jsp</result>
 		</action>
 		
-		<action name="edit" class="projectAction" method="prepareProjectForEdit">
-			<result name="success">/pages/project/project_create_edit.jsp</result>
-		</action>
-		
-		<action name="create" class="projectAction" method="prepareProjectForEdit">
-			<result name="success">/pages/project/project_create_edit.jsp</result>
+		<action name="settings" class="projectAction" method="prepareProjectSettings">
+			<result name="success">/pages/project/project_settings.jsp</result>
 		</action>
 		
 		<action name="save" class="projectAction" method="saveProject">
@@ -159,7 +157,6 @@
 				
                 <param name="project.pkey">${project.pkey}</param>
                 <param name="user.emailId">${user.emailId}</param>
-				
 			</result>
 			
 			<result name="input" type="redirectAction">
@@ -167,6 +164,10 @@
 				<param name="namespace">/</param>
 			</result>
 			
+		</action>
+		
+		<action name="publish_opts" class="projectAction" method="prepareProjectPublishDetails">
+			<result name="success">/pages/project/project_publish_details.jsp</result>
 		</action>
 		
 		<action name="delete" class="projectAction" method="deleteProject">
@@ -258,6 +259,9 @@
 				<param name="excludeProperties">
                     .*\.hibernateLazyInitializer, pages.*, page.*\.layout, page.*\.hotSpot, page.*\.hotSpots, page.*\.comments,  
                 </param>
+			</result>
+			<result name="error">
+				
 			</result>
 		</action>
 		
@@ -398,12 +402,22 @@
 		</action>
 	
 		<action name="manage_details" class="publishingAction" method="manageProjectPublishDetails">
+			
+			<result name="success" type="redirectAction">
+				<param name="actionName">view</param>
+				<param name="namespace">/project</param>
+				
+                <param name="project.pkey">${project.pkey}</param>
+			</result>
+			
+			<!-- 
 			<result name="success" type="json">
 				<param name="includeProperties"> messageBean.* </param>
 				<param name="excludeProperties">
                     .*\.hibernateLazyInitializer,
                 </param>
 			</result>
+			 -->
 		</action>	
 	
 		<action name="mobile" class="publishingAction" method="publishProjectForMobile">

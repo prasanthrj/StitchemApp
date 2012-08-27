@@ -7,11 +7,29 @@
 <script type="text/javascript">
 
 	var contextPath = '<%= request.getContextPath() %>';
-	var loggedInUserName = '<s:property value="loggedInUser.username"/>'
+	var loggedInUserName = '<s:property value="loggedInUser.username"/>';
 
-	$(document).ready(function(){
-		
-		
+	$(document).ready(function() {
+		/* 
+		$('#loginForm').ajaxForm({
+			beforeSubmit : function() {
+				
+			},
+			success : function(data) {
+// 				console.log(data);
+				if(data) {
+					if(data.error) {
+						
+					} else {
+						
+					}
+				}
+			},
+			complete : function() {
+				
+			}
+		});
+		 */
 	});
 	
 </script>
@@ -105,5 +123,7 @@
 </header>
 
 <!-- Header ends -->
+
+	
 	
 	

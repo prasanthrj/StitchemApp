@@ -1,5 +1,5 @@
 
-function prepareCanvasToolsForPage( currPagePkey ){
+function prepareCanvasToolsForPage(){
 	
 	var canvas = document.getElementById( canVasElementId );
 	var canvasElem = $(canvas);
@@ -12,7 +12,7 @@ function prepareCanvasToolsForPage( currPagePkey ){
 		clickX = new Array();
 		clickY = new Array();
 		clickDrag = new Array();
-					
+		
 		var mouseX = e.pageX - getAbsoluteCoordinates(this).x;
 		var mouseY = e.pageY - getAbsoluteCoordinates(this).y;
 		
@@ -28,7 +28,6 @@ function prepareCanvasToolsForPage( currPagePkey ){
 			var mouseY = e.pageY - getAbsoluteCoordinates(this).y;
 			
 			addClick(mouseX, mouseY, true);
-			
 			redraw();
 		}
 	});
@@ -42,8 +41,6 @@ function prepareCanvasToolsForPage( currPagePkey ){
 		
 		if(clickDrag && clickDrag[1]) {
 			resetHotSpotCreateForm();
-			
-			var hotSpot = {};
 			
 			var fromX = clickX[0];
 			var fromY = clickY[0];
@@ -60,10 +57,13 @@ function prepareCanvasToolsForPage( currPagePkey ){
 				toY = clickY[0];
 			}
 			
+			var hotSpot = {};
+			hotSpot.pkey = 0;
 			hotSpot.fromX = fromX / scaledWidth;
 			hotSpot.fromY = fromY / scaledHeight;
 			hotSpot.toX = toX / scaledWidth;
 			hotSpot.toY = toY / scaledHeight;
+			hotSpot.uiEvents = [];
 			
 			setHotSpotCoordinates( hotSpot );
 			
@@ -71,32 +71,24 @@ function prepareCanvasToolsForPage( currPagePkey ){
 			drawDivHotSpot( hotSpot, true );
 			
 			prepareHotSpotForEditing(hotSpot.pkey);
-			
+
 		}
 	});
 
 	function addClick(x, y, dragging) {
 		var index = 0;
-		
 		if (dragging) 
 			index = 1;
-		
-//		 TODO fix this 20 
-//		clickX[index] = x - 20;
-//		clickY[index] = y - 20;
-		clickX[index] = x - 10;
+
+		clickX[index] = x - 10;		// TODO fix this 
 		clickY[index] = y - 10;
 		clickDrag[index] = dragging;
-		
 	};
 	
 	function redraw() {
 		clearCanvas();	// Clears the canvas 
 		for ( var i = 0; i < clickX.length; i++) {
-
-			// do it only when its a drag 
 			if (clickDrag[i] && i) {
-				
 				var hotSpot = {};
 				hotSpot.fromX = clickX[0] / scaledWidth;
 				hotSpot.fromY = clickY[0] / scaledHeight;
@@ -104,12 +96,9 @@ function prepareCanvasToolsForPage( currPagePkey ){
 				hotSpot.toY = clickY[i] / scaledHeight;
 				
 				drawCanvasHotSpot(hotSpot , defFillStyle);
-				
 			} 
 		}
 	};
-
-	drawAllHotSpots(currentHotSpots);
 	
 };
 
@@ -153,24 +142,21 @@ function setHotSpotCoordinates( hotSpot, hotSpotDiv ) {
 		var hsDiv = $(hotSpotDiv);
 		
 		hotSpot = {};
+		hotSpot.pkey = 0;
 		hotSpot.fromX = hsDiv.position().left / scaledWidth;
 		hotSpot.fromY = hsDiv.position().top / scaledHeight;
 		hotSpot.toX = hotSpot.fromX + hsDiv.width() / scaledWidth;
 		hotSpot.toY = hotSpot.fromY + hsDiv.height() / scaledHeight;
 	}
 	
-	var hotSpotCreateEditForm = $('#hotSpotCreateEditForm');
-	
+	var hotSpotCreateEditForm = $('#' + hsDivPrefix + hotSpot.pkey + ' .hotSpotCreateEditForm');
 	hotSpotCreateEditForm.find('input[name$="fromX"]').attr('value', hotSpot.fromX );
 	hotSpotCreateEditForm.find('input[name$="fromY"]').attr('value', hotSpot.fromY );
 	hotSpotCreateEditForm.find('input[name$="toX"]').attr('value', hotSpot.toX );
 	hotSpotCreateEditForm.find('input[name$="toY"]').attr('value', hotSpot.toY );
 	
-	
 	// Hot Spots Coordinates 
-	
 	var hotSpotCoordinatesForm = $('#hotSpotCoordinatesForm');
-	
 	hotSpotCoordinatesForm.find('input[name$="fromX"]').attr('value', hotSpot.fromX );
 	hotSpotCoordinatesForm.find('input[name$="fromY"]').attr('value', hotSpot.fromY );
 	hotSpotCoordinatesForm.find('input[name$="toX"]').attr('value', hotSpot.toX );
@@ -212,63 +198,19 @@ function drawDivHotSpot( hotSpot, isEditable ){
 		var hotSpotDiv = $('#' + hotSpotDivId );
 		
 		if( hotSpotDiv.length == 0 ) {
-			var hotSpotDivHtml = '';
-			hotSpotDivHtml += '<div id="' + hotSpotDivId + '" class="div-hotspot" hs-pkey="' + hotSpot.pkey + '">';
-			hotSpotDivHtml += '<div class="pos-rel">';
-
-			hotSpotDivHtml += '<div class="tooltip-content tt-outer left-top" style="display: none;">';
-			hotSpotDivHtml += '<div class="tt-inner hs-tt-content">';
+			var hsDivHtml = '<div id="' + hotSpotDivId + '" class="div-hotspot" hs-pkey="' + hotSpot.pkey + '">';
+			hsDivHtml += new EJS({url: contextPath + '/pages/project/ejs/hotspot.ejs'}).render(hotSpot);
+			hsDivHtml += '</div>';
 			
-			hotSpotDivHtml += '<div class="float-fix">';
-			hotSpotDivHtml += '<a href="javascript:void(0)" class="float-right close-tt">X</a>';
-			hotSpotDivHtml += '<a class="bin-icon hs-delete-btn" hot-spot-pkey="' + hotSpot.pkey + '"> delete </a>';
-			hotSpotDivHtml += '</div>';
-			
-			hotSpotDivHtml += '<form class="hotSpotCreateEditForm" method="post">';
-			
-			hotSpotDivHtml += '<input type="hidden" value="' + projectPkey + '" name="project.pkey" value="" >';
-			hotSpotDivHtml += '<input type="hidden" value="' + currPagePkey + '" name="page.pkey" value="">';
-			if(hotSpot.pkey)
-				hotSpotDivHtml += '<input type="hidden" value="' + hotSpot.pkey + '" name="hotSpot.pkey" />';
-			
-			hotSpotDivHtml += '<input type="hidden" value="' + hotSpot.fromX + '" name="hotSpot.fromX" />';
-			hotSpotDivHtml += '<input type="hidden" value="' + hotSpot.fromY + '" name="hotSpot.fromY" />';
-			hotSpotDivHtml += '<input type="hidden" value="' + hotSpot.toX + '" name="hotSpot.toX" />';
-			hotSpotDivHtml += '<input type="hidden" value="' + hotSpot.toY + '" name="hotSpot.toY" />';
-			
-			hotSpotDivHtml += '<ul class="events-list">';
-			
-			if(hotSpot.uiEvents) {
-				var uiEvents = hotSpot.uiEvents;
-				for ( var i = 0; i < uiEvents.length; i++) {
-					hotSpotDivHtml += '<li>' + prepareUiEventHtml(uiEvents[i], i) + '</li>';
-				}
-			}
-			
-			hotSpotDivHtml += '<li>';
-			hotSpotDivHtml += '<div class="margin-5px">';
-			hotSpotDivHtml += '<a href="javascript:void(0);" class="plus-icon bold margin-5px add-more-events-btn" > add new Interaction </a>';
-			hotSpotDivHtml += '</div>';
-			hotSpotDivHtml += '</li>';
-			hotSpotDivHtml += '</ul>';
-			hotSpotDivHtml += '</form>';
-			
-			hotSpotDivHtml += '</div>';
-			hotSpotDivHtml += '</div>';
-			hotSpotDivHtml += '</div>';
-			
-			hotSpotDivHtml += '</div>';
-			
-			$('#' + hotSpotsHolderId ).append(hotSpotDivHtml);
+			$('#' + hotSpotsHolderId ).append(hsDivHtml);
 			hotSpotDiv = $('#' + hotSpotDivId );
 			
 			var eventsList = hotSpotDiv.find('.events-list:first');
-			var binIcons = eventsList.find('.bin-icon');
+			var binIcons = eventsList.find('.delete-uiEvent-btn');
 			binIcons.hide();
 			if(binIcons && binIcons.length > 1){
 				binIcons.show();
 			}
-			
 		}
 		
 		var fillStyle = defFillStyle;
@@ -276,9 +218,9 @@ function drawDivHotSpot( hotSpot, isEditable ){
 		hotSpotDiv.resizable({
 			disabled: false,
 			handles: 'n, e, s, w, ne, se, sw, nw',
-			create: function(event, ui) { event.stopImmediatePropagation(); event.preventDefault(); return false; },
-			start: function(event, ui) { event.stopImmediatePropagation(); event.preventDefault(); return false; },
-			resize: function(event, ui) { event.stopImmediatePropagation(); event.preventDefault(); return false; },
+			create: function(event, ui) { preventEventDefaults(event); },
+			start: function(event, ui) { preventEventDefaults(event); },
+			resize: function(event, ui) { preventEventDefaults(event); },
 			stop: function(event, ui) { 
 				event.stopImmediatePropagation();
 				event.preventDefault();
@@ -296,9 +238,9 @@ function drawDivHotSpot( hotSpot, isEditable ){
 		hotSpotDiv.draggable({
 			disabled: false,
 			containment: 'parent',
-			create: function(event, ui) { event.stopImmediatePropagation(); event.preventDefault(); return false; },
-			start: function(event, ui) { event.stopImmediatePropagation(); event.preventDefault(); return false; },
-			drag: function(event, ui) { event.stopImmediatePropagation(); event.preventDefault(); return false; },
+			create: function(event, ui) { preventEventDefaults(event); },
+			start: function(event, ui) { preventEventDefaults(event); },
+			drag: function(event, ui) { preventEventDefaults(event); },
 			stop: function(event, ui) {
 				event.stopImmediatePropagation();
 				event.preventDefault();
@@ -314,7 +256,7 @@ function drawDivHotSpot( hotSpot, isEditable ){
 		});
 		
 		fillStyle = editFillStyle;
-			
+
 		hotSpotDiv.css({
 			'left' : x1,
 			'top' : y1,
@@ -375,9 +317,9 @@ function resetHotSpotCreateForm(){
 	};
 	
 	var eventDiv = $(eventDivs[0]);
-	eventDiv.find('select[name*=toPage]').val(-1);
-	eventDiv.find('select[name$=transitionType]').val(-1);
-	eventDiv.find('select[name$=eventType]').val(-1);
+	eventDiv.find('select[name*=toPage]').val(0);
+	eventDiv.find('select[name$=transitionType]').val(0);
+	eventDiv.find('select[name$=eventType]').val(0);
 	
 };
 
@@ -435,15 +377,16 @@ function prepareHotSpotCreateForm( hotSpotPkey ){
 	
 };
 
-
+// TODO  maybe we need when and then 
 function fetchHotSpotByPkey (hotSpotPkey) {
 	var hotSpot = null;
 	if(hotSpotPkey) {
 		// get hotspot using its hotSpotPkey ... 
 		var fetchHotSpotUrl = contextPath + '/project/build/edit_hot_spot?hotSpot.pkey=' + hotSpotPkey ;
 		$.getJSON(fetchHotSpotUrl, function(data) {
-			if(data)
-				return hotSpot = data.hotSpot;
+			if(data) {
+				return data.hotSpot;
+			}
 		});
 	}
 	return hotSpot;
@@ -498,12 +441,6 @@ function showHideAllHotSpots( element ){
 
 
 
-
-
-
-
-
-
 /* Document ready functions   */
 
 $(document).ready(function(){
@@ -533,29 +470,18 @@ $(document).ready(function(){
 			
 			var hsPkey = parseInt(hsDiv.attr("hs-pkey"));
 			$('.curr-hotspot-pkey').attr('value', hsPkey);
-			
-			if (hsPkey && hsPkey != '' && parseInt(hsPkey)) {
-				prepareHotSpotForEditing(hsPkey);
-			}
+			prepareHotSpotForEditing(hsPkey);
 		}
 	});
 	
 	
 	/* Cancelling HotSpot Editing ... */
 	
-	
-	$('#hs-div-undefined .bin-icon').live('click', function(event){
-		preventEventDefaults(event);
-		
-		// TODO Complete
-	});
-	
 	$('.hs-delete-btn').live('click', function(event){
 		preventEventDefaults(event);
 		
 		var hotSpotPkey = $(this).attr('hot-spot-pkey');
 		removeHotSpot( hotSpotPkey, this );
-		
 	});
 	
 	$('.hs-link-btn').live('click', function(event){
@@ -563,11 +489,7 @@ $(document).ready(function(){
 		
 		var toPagePkey = $(this).attr('to-page-pkey');
 		preparePageForEditing( toPagePkey, this );
-		
 	});
-	
-	
-	// -------------------------------------
 	
 	$('.hotSpotCreateEditForm select').live('change', function(){
 		var hsForm = $(this).parents('.hotSpotCreateEditForm:first');
@@ -575,7 +497,7 @@ $(document).ready(function(){
 		var isReadyToSave = true;
 		for(var i = 0; i < selects.length; i++ ){
 			var select = $(selects[i]);
-			if(select.val() == -1) {
+			if(select.val() == 0) {
 				isReadyToSave = false;
 				return;
 			}
@@ -585,18 +507,64 @@ $(document).ready(function(){
 			hsForm.ajaxForm({
 				url : contextPath + '/project/build/save_hot_spot',
 				success : function(data){
-					updatePageHotSpots();
+					updatePageHotSpots(); 	// TODO avoid this 
 				}
 			}).trigger('submit');
 		}
 	}); 
 	
+	$('.add-more-events-btn').live('click', function() {
+		var eventsList = $(this).parents('.events-list:first');
+		
+		var lastEventDiv = eventsList.find('.new-event-div:last');
+		var newIndex = parseInt(lastEventDiv.attr('index')) + 1;
+		
+		var eventHtml = prepareUiEventHtml(null, newIndex);
+		eventsList.prepend('<li>' + eventHtml + '</li>');
+		
+		setBinIcons(eventsList);
+	});
+
+	$('.delete-uiEvent-btn').live('click', function() {
+		var eventDiv = $(this).parents('.new-event-div:first');
+		var eventsList = $(this).parents('.events-list:first');
+		
+		var eventPkey = eventDiv.find('.ui-event-pkey').val();
+		if(eventPkey && eventPkey != ''){
+			var deleteEventPkey = contextPath + '/project/build/remove_ui_event?page.pkey=' + currPagePkey + '&uiEvent.pkey=' + eventPkey ;   
+			$.getJSON(deleteEventPkey, function(data) {
+				if(data) {
+					updatePageHotSpots();
+					eventDiv.remove();
+				}
+			});
+		} else {
+			eventDiv.remove();
+		}
+		
+		setBinIcons(eventsList);
+	});
+	
+	function setBinIcons(eventsList) {
+		if(eventsList) {
+			var binIcons = eventsList.find('.delete-uiEvent-btn');
+			binIcons.hide();
+			if(binIcons && binIcons.length > 1){
+				binIcons.show();
+			}
+		}
+	};
+	
+
+	$('.supp-img-cont').live('click', function(event){
+		preventEventDefaults(event);
+	});
+	
+	$('#build-left-cont, #build-right-cont').live('click', function(){
+		$('.tooltip-content').hide('fade');
+	});
 	
 });
-
-
-
-
 
 
 
