@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Template</title>
+</head>
+<body>
+	<div style="max-width:500px;color:#000;font-size:16px;letter-spacing:0;font-family:helvetica, Sans-Serif, Verdana, Arial;overflow:hidden;padding:20px 40px;">
+		<h1 style="font-size:36px; color: #969191; letter-spacing: -1px;">Stitchemapp</h1>
+		
+		<h2 style="font-weight:normal;font-size:18px;line-height:22px;margin:0;">{0} has shared a new {1} project with you!</h2>
+		<h5 style="font-weight:normal;font-size:14px;line-height:20px;color:#969191;margin:0;">Point you smartphone to the QR code before to view the project right away </h5>
+		
+		<div style="overflow: hidden;">
+			<img style="float:left;margin:5px;" src="http://192.168.6.119:8000/stitchemapp/publish/mobile_qrcode?project.pkey={2}">
+			<label style="float:left;margin:70px 50px 0;"> Or </label>
+			<a href="http://192.168.6.119:8000/stitchemapp/project/view?project.pkey={2}" style="float:right;border:3px solid #C7C7C7;color:#333;font-size:13px;font-weight:bold;text-align:center;width:auto;padding:5px 12px 7px;background:#F7FF5C;margin: 60px 60px 0 0;"> Visit Project </a>
+		</div>
+		
+		<div style="color:#B8B8B8;margin-top:30px;padding:4px 8px 0px;background:#333;overflow: hidden;font-size: 13px;border-bottom: 4px solid #F7FF5C;">
+			<label><a href="http://localhost:8000/stitchemapp/static/privacy" style="color: #B8B8B8;float: left;margin: 5px;"> Privacy Policy </a></label>
+			<label style="color: #B8B8B8;float: left;margin: 5px;"> | </label>
+			<label><a href="http://localhost:8000/stitchemapp/static/contact" style="color: #B8B8B8;float: left;margin: 5px;"> Contact Us </a></label>
+			<label style="color: #B8B8B8;float: left;margin: 5px;"> | </label>
+			<label><a href="http://localhost:8000/stitchemapp/static/feedback" style="color: #B8B8B8;float: left;margin: 5px;"> Feedback </a></label>
+			<label style="float: right;"><img src="http://localhost:8000/stitchemapp/themes/images/fb-dark.png"></label>
+			<label style="float: right;"><img src="http://localhost:8000/stitchemapp/themes/images/twitter-dark.png"></label>
+		</div>
+		<p style="font-size:13px;color:#969191;">
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+		</p>
+	</div>
+</body>
+</html>

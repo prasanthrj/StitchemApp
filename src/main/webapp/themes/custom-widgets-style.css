@@ -29,11 +29,14 @@
 }
 
 .pu-body .msg-cont {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 40px;	
+	font-size: 13px;
+    left: 0;
+    min-height: 20px;
+    padding: 30px 40px 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-weight: bold;
 }
 
 .pu-content {
@@ -85,7 +88,7 @@
 }
 
 #loginForm {
-    margin: 20px 40px 40px;
+    margin: 20px 40px 5px;
 }
 
 #loginForm input {
@@ -241,18 +244,19 @@
 }
 
 #publish-contacts-cont {
-	margin: 15px 3px;
+	margin: 15px 0px;
 }
 
 #app-users-list {
-	margin: 10px 3px;
-	overflow: hidden;
+	border-bottom: 1px solid #EEEEEE;
+    margin: 10px 0 !important;
+    overflow: hidden;
 }
 
 #app-users-list li {
-	border-top: 1px solid #999999;
+	border-top: 1px solid #CCCCCC;
     overflow: hidden;
-    padding: 4px 0;
+    padding: 7px 8px 5px;
 }
 
 #app-users-list label {

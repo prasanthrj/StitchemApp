@@ -7,15 +7,53 @@
 <html>
 
 <head>
+	<title> Oops !!! </title>
 	
-	<meta>
-	<title> Oops !!! RP Error </title>
+	<style type="text/css">
 	
-	<script type="text/javascript">
+	#global-error-cont {
+		margin: 10px auto;
+		width: 600px;
+	}
+	
+	#global-error-cont h1 {
+		font-size: 36px;
+	    font-weight: bold;
+	    letter-spacing: -2px;
+	    line-height: 40px;
+	    float: left;
+	    clear: both;
+	    min-width: 400px;
+	}
+	
+	#global-error-cont img {
+		float: right;
+		margin: 5px 25px 0 0;
+	}
+	
+	</style>
+	
+	<script type="text/javascript" >
 	$(document).ready( function() {
-	
+		
+		/* Window resize related ... */
+		
+		adjustToWindowDimentions(); 
+		
+		$(window).resize(function() {
+			adjustToWindowDimentions(); 
+		});
+		
 		
 	});
+	
+	/* Window resize */
+	
+	function adjustToWindowDimentions(){
+		adjustBodyToWindowDimensions();		// body .. 
+	
+	};
+	
 	</script>
 	
 </head>
@@ -23,19 +61,25 @@
 <body>
 
 	<!-- Body Content -->
-	
-	<section class="float-left clear full-width" id="body-content">
-		<div class="in">
-			 
-			ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-		
-			<div class="links-cont">
-				<label class="page-title">Error</label>
-	          	<input type="button" class="gray-btn gray-btn-small" value="<s:text name="errors.back"/>" onClick="history.go(-1)">
-			</div>
-
+	<div id="top-cont" class="yellow-bg">
+		<div id="page-title-cont" class="float-fix">
+			<label class="page-title"> Ooops </label>
 		</div>
-	</section>
+	</div>
+	
+	<div id="main-cont" class="float-fix">
+		<div id="global-error-cont" class="float-fix">
+			<h1> Whoops, </h1>
+			<h1> Something's broken !  </h1>
+			
+			<img alt="Oops" src="<%= request.getContextPath() %>/themes/images/error_broken.png">
+		
+			<div class="float-left" style="margin-top: 220px;">
+	        	<input type="button" class="btn btn-yellow" value="Go Back" onClick="history.go(-1)">
+			</div>
+		</div>
+	</div>
 	
 </body>
+</html>
 		

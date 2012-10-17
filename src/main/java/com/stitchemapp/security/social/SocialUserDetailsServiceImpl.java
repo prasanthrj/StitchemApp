@@ -25,7 +25,6 @@ public class SocialUserDetailsServiceImpl implements SocialUserDetailsService {
 	
 	
 	
-	
 	/* SocialUser CRUD */
 	
 	
@@ -55,8 +54,6 @@ public class SocialUserDetailsServiceImpl implements SocialUserDetailsService {
 	}
 	
 	
-	
-	
 	/* Social connections  */
 	
 	@Transactional
@@ -70,7 +67,7 @@ public class SocialUserDetailsServiceImpl implements SocialUserDetailsService {
 			
 			user.setSocialUser(true);
 			
-			user.setDisplayName(socialDetails.getDisplayName());
+			user.setFullName(socialDetails.getDisplayName());
 			user.setEmailId(socialDetails.getEmailId());
 			
 			user.setAvatarurl(socialDetails.getAvatarUrl());

@@ -1,9 +1,6 @@
 package com.stitchemapp.security;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.stitchemapp.entities.User;
 
@@ -13,6 +10,8 @@ public interface UserService extends UserDetailsService {
 	/* User CRUD */
 	
 	// Register User
+		
+	
 	void createUser(User user);
 	
 	
@@ -21,9 +20,9 @@ public interface UserService extends UserDetailsService {
 	User readUser(String username);
 	
 	User readUserByEmailId(String emailId);
-		
 
-	void updateUser(User user);
+
+	void updateUser(User user, Boolean isPasswdChanged);
 	
 	
 	void deleteUser(User user);
@@ -34,16 +33,18 @@ public interface UserService extends UserDetailsService {
 	
 	
 	User findOrCreateUser(User user);
-	
-
-	void changePassword(String oldPassword, String newPassword);
 
 	boolean userExists(String username);
 	
 	
+	void registerUser(User user);
+	
+	void resetUserCredentials(String emailId);
+	
+	
 	/* On Context Refresh */
 	
-	void refreshStandardUsers();
+	void refreshAndUpdateStandardUsers();
 	
 	
 	

@@ -61,33 +61,11 @@ jQuery.fn.customInput = function(){
 
 $(document).ready(function(){
 	
-	/* Custom Styling ... */
-	
-//	$('input').customInput();
-//	$('select').customSelect();
-	
-	
-	
     /* Collapsible Carousel */
 	
 	$('.collapse-icon').live('click',function(){
 		var carouselCont = $('#carousel-cont');
 		carouselCont.slideToggle(600);
-		
-//		var carouselList = carouselCont.find('ul.carousel-list');
-		
-//		if(carouselCont.css('display') == 'none'){
-//			carouselCont.slideDown('slow');
-//			carouselCont.slideDown(2000, function(){
-//				carouselList.show('fade');
-//			});
-//		} else {
-//			carouselCont.slideUp('slow');
-//			carouselList.hide('fade', function(){
-//				carouselCont.slideUp(2000);
-//			});
-//		}
-		
 	});
 	
 	

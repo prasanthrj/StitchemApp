@@ -31,21 +31,23 @@ public class User extends BaseEntity implements UserDetails {
 	private String username;
 	private String password;
 	
-	private String displayName;
+//	private String displayName;
 	private String fullName;
 	private String emailId;
 	
+	private String location;
+	
 	private String activationToken;
-	
+
 	private UserNotifications notifications;
-	
-	
+		
 	// UserDetails related
 	private Collection<GrantedAuthority> authorities;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
 	private boolean credentialsNonExpired = true;
 	private boolean enabled = true;
+	
 	
 	private UserInfo userInfo;
 	
@@ -75,18 +77,18 @@ public class User extends BaseEntity implements UserDetails {
 		this.password = password;
 	}
 	
+	/*
 	@Column(name = "display_name" )
 	public String getDisplayName() {
-		
 		if (displayName == null)
 			displayName = this.fullName;
-		
 		return displayName;
 	}
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+	*/
 
 	@Column(name = "full_name")
 	public String getFullName() {
@@ -104,6 +106,15 @@ public class User extends BaseEntity implements UserDetails {
 
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
+	}
+
+	@Column(name = "location")
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	@Column(name = "activation_token")

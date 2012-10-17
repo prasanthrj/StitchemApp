@@ -9,13 +9,13 @@
 
 <head>
 
-	<title> Project View </title>
+	<title> Publish Options </title>
 	
-	<script type="text/javascript" >
+	<script type="text/javascript">
 	
 	$(document).ready( function() {
 		
-		$(window).keydown(function(event){
+		$(window).keydown(function(event) {
 			if(event.keyCode == 13) {
 				event.preventDefault();
 				return false;
@@ -33,7 +33,7 @@
 		var index = 0;
 		
 		var appUserInput = $('#add-app-user-input');
-		appUserInput.live("keyup", function(event){
+		appUserInput.live("keyup", function(event) {
 			if(event.keyCode == '13'){
 				event.preventDefault();
 
@@ -93,20 +93,36 @@
 		<div id="preview-cont" class="border-frame">
 			<iframe src="<%= request.getContextPath() %>/publish/mobile?project.pkey=<s:property value="project.pkey" />&user.emailId=<s:property value="loggedInUser.emailId"/>" id="preview-iframe"> 
 				<p> Oooops ... , your browser currently doesn't support IFrames .. !!!</p>
-				<p> Supported browsers: <a href="http://www.opera.com">Opera</a>, <a href="http://www.mozilla.com">Firefox</a>, <a href="http://www.apple.com/safari">Safari</a>, and <a href="http://www.konqueror.org">Konqueror</a>. </p>
 			</iframe>
 		</div>
 		
 		<div id="project-info-cont" class="float-left">
 			
-			<div id="qr-code-cont" class="float-left">
-				<img id="QRcode-img" alt="QR Code" title="Scan to view it on device" src="<%= request.getContextPath() %>/publish/mobile_qrcode?project.pkey=<s:property value="project.pkey" />">
-			</div>
-			
-			<div class="float-left">
-				<label class="sub-title"> Device : </label>
-				<p class="bold"> <s:property value="project.projectType" /> ( <s:property value="project.layout.width" />px <span class="normal"> X </span> <s:property value="project.layout.height" />px ) </p>
-			</div>
+			<table>
+				<tr>
+					<td>
+						<div id="qr-code-cont">
+							<img id="QRcode-img" alt="QR Code" title="QR Code : Scan to view it on device" 
+								src="<%= request.getContextPath() %>/publish/mobile_qrcode?project.pkey=<s:property value="project.pkey" />">
+						</div>
+					</td>
+					<td>
+						<ul id="" class="float-left">
+							<li>
+								<h1 class="bold"> Sharing settings </h1>
+							</li>
+							<li>
+								<label class=""> link to view on device : </label> 
+								<input type="text" value="/publish/device?project.pkey=<s:property value="project.pkey" />" class="float-left clear" style="width: 500px;">
+							</li>
+							<li>
+								<label class=""> link to view on desktop : </label>
+								<input type="text" value="/publish/web?project.pkey=<s:property value="project.pkey" />" class="float-left clear" style="width: 500px;">
+							</li>
+						</ul>
+					</td>
+				</tr>
+			</table>
 			
 		</div>
 		
@@ -119,56 +135,41 @@
 				<input type="hidden" name="publishDetails.pkey" value="<s:property value="publishDetails.pkey" />">
 				
 				<div class="float-fix">
-					<label class="pu-title margin-5px"> Share your pattern </label>
-
-					<div id="publish-visibility" class="float-fix float-right">
-						<input type="radio" name="isPublic" value="true" id="visible-public" checked="checked" class="isPublic">
-						<label for="visible-public">Public</label>
-						<input type="radio" name="isPublic" value="false" id="visible-private" class="isPublic">
+					<label style="color: #666666; font-size: 14px; font-weight: bold; margin: 5px 0;"> I would like my project to be &nbsp; &nbsp; &nbsp; </label>
+					
+					<div id="publish-visibility" class="float-fix float-left">
+						<input type="radio" name="project.isPublic" value="true" id="visible-public" checked="checked" class="isPublic">
+						<label for="visible-public">Public &nbsp; &nbsp; </label>
+						<input type="radio" name="project.isPublic" value="false" id="visible-private" class="isPublic">
 						<label for="visible-private">Private</label>
 					</div>
-				
-				</div>
-				
-				<div class="float-fix">
-					<textarea name="project.description" rows="" cols="80" class="inp-box inner-shadow" placeholder="Project description"
-						style=" margin: 3px; margin-top: 10px;" > <s:property value="project.description"/> </textarea>
+					
 				</div>
 				
 				<div id="publish-contacts-cont" class="float-fix">
 				
-					<label class="clear gray-999-text" style="float: none; display: block;"> people you are sharing with : </label>
+					<label class="clear gray-999-text" style="float: none; display: block;"> Notify the people below with an email : </label>
 				 	<ul class="clear" id="app-users-list">
 				 		<s:iterator value="appUsers" var="appUser" status="idx">
 				 			<li>
-<!-- 				 				<s:if test="%{#appUser.pkey != null && #appUser.name != '' }"> -->
-<!-- 				 					<label><s:property value="%{#appUser.name}" /></label> -->
-<!-- 				 				</s:if> -->
-<!-- 				 				<s:else> -->
-			 						<label><s:property value="%{#appUser.emailId}" /></label>
-<!-- 				 				</s:else> -->
-
-								<s:if test="%{#appUser.isPublisher != true }">
-				 					<a href="javascript:void(0);" class="bin-icon float-right" ></a>
+				 				<s:if test="%{#appUser.fullName != null && #appUser.fullName != '' }">
+				 					<label><s:property value="%{#appUser.fullName}" /></label>
 				 				</s:if>
 				 				<s:else>
-				 					<span class="float-right"> Yourself </span>
+			 						<label><s:property value="%{#appUser.emailId}" /></label>
 				 				</s:else>
-				 				
-				 				<input type="hidden" name="appUsers[<s:property value="%{#idx.index}" />].emailId" value="<s:property value="%{#appUser.emailId}" />">
-				 				<input type="hidden" name="appUsers[<s:property value="%{#idx.index}" />].pkey" value="<s:property value="%{#appUser.pkey}" />">
+				 				<a href="javascript:void(0);" class="bin-icon float-right" ></a>
 				 			</li>
 					    </s:iterator>
 				 	</ul>
 				
 					<div class="" style="margin: 4px 0;">
-						<input type="text" class="inp-box inner-shadow " placeholder="add people email-ids" id="add-app-user-input">
-<!-- 						<a id="add-app-user-btn" href="javascript:void(0);"> + Add </a> -->
+						<input type="email" class="inp-box inner-shadow " placeholder=" + add people email-ids" id="add-app-user-input" style="width: 400px;">
 					</div>
 			
 				</div>
 				
-				<div class="btn-cont float-right no-margin no-padding">
+				<div class="float-left">
 					<input type="submit" value="Publish Project" id="publish-proj-btn" class="btn btn-yellow">
 				</div>
 				

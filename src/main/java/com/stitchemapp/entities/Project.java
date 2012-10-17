@@ -1,6 +1,7 @@
 package com.stitchemapp.entities;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -62,7 +63,7 @@ public class Project extends BaseEntity {
 	private Boolean isApproved = false;
 	
 	// For cascading.. 
-	private List<User> appUsers;
+	private Set<User> appUsers;
 	private List<Comment> comments;
 	
 	
@@ -169,11 +170,11 @@ public class Project extends BaseEntity {
 	@JoinTable(name = "project_app_users_mapping_table", 
 			joinColumns = @JoinColumn(name = "project_pkey"),
 			inverseJoinColumns = @JoinColumn(name = "app_user_pkey"))
-	public List<User> getAppUsers() {
+	public Set<User> getAppUsers() {
 		return appUsers;
 	}
 
-	public void setAppUsers(List<User> appUsers) {
+	public void setAppUsers(Set<User> appUsers) {
 		this.appUsers = appUsers;
 	}
 

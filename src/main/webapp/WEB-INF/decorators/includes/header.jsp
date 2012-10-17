@@ -6,30 +6,47 @@
 <!DOCTYPE HTML>
 <script type="text/javascript">
 
+// 	var contextPath = '${pageContext.request.contextPath}';
+
 	var contextPath = '<%= request.getContextPath() %>';
 	var loggedInUserName = '<s:property value="loggedInUser.username"/>';
 
 	$(document).ready(function() {
-		/* 
+		
+		var signInMsgCont = $('#sign-in-cont .msg-cont');
+		
 		$('#loginForm').ajaxForm({
+			type: "POST",
 			beforeSubmit : function() {
-				
+				$('body').css({	'cursor': 'progress' });
 			},
-			success : function(data) {
-// 				console.log(data);
-				if(data) {
-					if(data.error) {
-						
+			beforeSend: function (xhr) {
+		        xhr.setRequestHeader("X-Ajax-call", "true");
+		    },
+			complete : function(result) {
+				$('body').css({	'cursor': 'auto' });
+				if(result && result.responseText) {
+					var response = $.parseJSON(result.responseText);
+					if(response && response.isAuthenticated) {
+						if(response.targetUrl) {
+							if(response.targetUrl.indexOf('stitchemapp/home') >= 0) {
+								window.location.href = 'user/home';
+							} else {
+								window.location.href = response.targetUrl;
+							}
+						}
 					} else {
-						
+						signInMsgCont.html('<label class="error">Bad Credentials</label>').show('fade');
 					}
-				}
-			},
-			complete : function() {
-				
+				} 
 			}
 		});
-		 */
+		
+		$('#loginForm input').bind('focus', function(){
+			signInMsgCont.hide('fade');
+			this.select();
+		});
+		
 	});
 	
 </script>
@@ -55,7 +72,7 @@
 				</auth:authorize>
 				<auth:authorize ifNotGranted="ROLE_ANONYMOUS">
 					<li>
-						<a href="<%= request.getContextPath() %>/user/home" > <s:property value="loggedInUser.username"/> </a>
+						<a href="<%= request.getContextPath() %>/user/home" > <s:property value="loggedInUser.fullName"/> </a>
 					</li>
 					<li>
 						<a href="<%= request.getContextPath() %>/j_spring_security_logout" >logout</a>
@@ -71,7 +88,6 @@
 	            	<a href="<%= request.getContextPath() %>/static/contact">contact</a>
 				</li>
 				<li>
-<%-- 	              	<a href="<%= request.getContextPath() %>/blog">blog</a> --%>
 					<a href="javascript:void(0);">blog</a>
 				</li>
 			</ul>
@@ -80,43 +96,49 @@
 	
 	<section class="pop-ups-cont" >
 	
-		<!-- Sign In Container -->
-		
-		<div id="sign-in-cont" class="pop-up">
-			<div class="pu-body">
-				<div class="msg-cont"></div>
-				<div class="pu-content">
-					<form id="loginForm" action="<%= request.getContextPath() %>/login/authenticate" method="post">
-						<input id="username-input" type="text" name="j_username" value="" placeholder="username">
-						<input id="password-input" type="password" name="j_password" value="" placeholder="password">
-						<input id="signin-input" type="submit" value="Sign In" name="signin" class="btn btn-yellow">
-					</form>
-				</div>
-			</div>
+		<auth:authorize ifAnyGranted="ROLE_ANONYMOUS">
 			
-			<div id="ext-signin">
-				<label>login with ...</label>
-				<ul class="inline-list float-right">
-					<li>
-						<form name="signin_fb" id="" action="<%= request.getContextPath() %>/login?auth_provider=facebook" method="POST">
-					        <input type="hidden" name="scope" value="publish_stream,user_photos,offline_access" />
-							<input id="signin-fb" type="submit" value="" name=""/>
+			<!-- Sign In Container -->
+			<div id="sign-in-cont" class="pop-up">
+				<div class="pu-body">
+					<div class="msg-cont"></div>
+					<div class="pu-content">
+						<form id="loginForm" action="<%= request.getContextPath() %>/login/authenticate" method="post">
+							<input type="hidden" name="targetUrl" value="<%= request.getRequestURI() %>?<%= request.getQueryString() %>">
+							<input id="username-input" type="text" name="j_username" value="" placeholder="Username or Email">
+							<input id="password-input" type="password" name="j_password" value="" placeholder="Password">
+							<input id="signin-input" type="submit" value="Sign In" name="signin" class="btn btn-yellow">
 						</form>
-					</li>
-					<li>
-						<form name="signin_gg" id="" action="<%= request.getContextPath() %>/login?auth_provider=google" method="POST">
-							<input id="signin-gg" type="submit" value="" name=""/>
-						</form>
-					</li>
-					<li>
-						<form id="signin_tw" id="" action="<%= request.getContextPath() %>/login?auth_provider=twitter" method="POST">
-							<input id="signin-tw" type="submit" value="" name=""/>
-						</form>
-					</li>
-				</ul>
+					</div>
+					<div style="margin: 5px 42px 30px;">
+						<a class="bold" href="<%= request.getContextPath() %>/forgot_password"> Forgot Password ? </a>
+					</div>
+				</div>
+				
+				<div id="ext-signin">
+					<label>login with ...</label>
+					<ul class="inline-list float-right">
+						<li>
+							<form name="signin_fb" id="" action="<%= request.getContextPath() %>/login?auth_provider=facebook" method="POST">
+						        <input type="hidden" name="scope" value="publish_stream,user_photos,offline_access" />
+								<input id="signin-fb" type="submit" value="" name=""/>
+							</form>
+						</li>
+						<li>
+							<form name="signin_gg" id="" action="<%= request.getContextPath() %>/login?auth_provider=google" method="POST">
+								<input id="signin-gg" type="submit" value="" name=""/>
+							</form>
+						</li>
+						<li>
+							<form id="signin_tw" id="" action="<%= request.getContextPath() %>/login?auth_provider=twitter" method="POST">
+								<input id="signin-tw" type="submit" value="" name=""/>
+							</form>
+						</li>
+					</ul>
+				</div>
+		
 			</div>
-	
-		</div>
+		</auth:authorize>
 	
 	</section>
 	

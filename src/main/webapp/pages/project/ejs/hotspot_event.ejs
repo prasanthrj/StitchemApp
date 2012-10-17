@@ -1,0 +1,47 @@
+
+<div class="new-event-div" index="<%= index %>">
+					
+	<input type="hidden" name="uiEvents[<%= index %>].pkey" value="" class="ui-event-pkey"> 
+	<a href="javascript:void(0);" class="bin-icon margin-5px float-right" style="display: none;"></a>
+						
+	<ul class="new-event-list" >
+		<li class="">
+			<label class="">on </label>
+			<select name="uiEvents[<%= index %>].eventType" class="mandatory short">
+				<option value="-1"> - event - </option>
+				<option value="tap">Tap</option>
+				<option value="taphold">Taphold</option>
+				<option value="swipe">Swipe</option>
+				<option value="swipeleft">Swipe Left</option>
+				<option value="swiperight">Swipe Right</option>
+			</select>
+		</li>
+		<li class="">
+			<label class="">go to </label>
+			<select name="uiEvents[<%= index %>].toPage.pkey" class="mandatory short">
+				<option value="-1"> - page - </option>
+				
+				<!-- TODO Finish it  -->
+				
+				
+			</select>
+		</li>
+		<li class="">
+			<label class="">with </label>
+			<select name="uiEvents[<%= index %>].transitionType" class="mandatory short">
+				<option value="-1"> - transition - </option>
+				<option value="fade">Fade</option>
+				<option value="pop">Pop</option>
+				<option value="flip">Flip</option>
+				<option value="turn">Turn</option>
+				<option value="flow">Flow</option>
+				<option value="slidefade">Slide-fade</option>
+				<option value="slide">Slide</option>
+				<option value="slideup">Slide-up</option>
+				<option value="slidedown">Slidedown</option>
+				<option value="none">None</option>
+			</select>
+		</li>
+	</ul>
+	
+</div>

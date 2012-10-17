@@ -1,11 +1,14 @@
 package com.stitchemapp.services;
 
+import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 
 import com.stitchemapp.entities.Project;
 import com.stitchemapp.entities.PublishDetails;
+import com.stitchemapp.entities.User;
 
 public interface PublishingService {
 	
@@ -21,19 +24,14 @@ public interface PublishingService {
 	void deletePublishDetails(PublishDetails publishDetails);
 	
 	
-	
 	/* Publishing Related */
 	
 	String prepareProjectPublishDoc(Project project);
 	
-	void broadcastProjectPublishingDetailsToUsers(Project project, String HostURL);
+	void publishProjectDetailsAndUpdateAppUsers(Project project, String HostURL, List<User> appUsers);
 	
 	
-	
-	
-	/* Utils */
-	
-	/* HTML parsers */
+	/* HTML Rendering */
 
 	Document renderHTMLforMobileProject(Project project) throws ParserConfigurationException;
 	

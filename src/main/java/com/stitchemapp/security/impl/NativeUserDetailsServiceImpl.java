@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.authentication.dao.SaltSource;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +24,9 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 	public static final Logger LOGGER = Logger.getLogger(NativeUserDetailsServiceImpl.class);
 	
 	private IDao genericDao;
+	
 	private PasswordEncoder passwordEncoder;
+	private SaltSource saltSource;
 	
 	private MailingService mailingService;
 
@@ -33,7 +36,7 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 	@Override
 	@Transactional
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		this.refreshStandardUsers();
+		this.refreshAndUpdateStandardUsers();
 	}
 	
 
@@ -45,12 +48,11 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 			genericDao.save(user);
 			
 			// Now hash the password and update the user 
+//			String encPassword = passwordEncoder.encodePassword(passwd, saltSource.getSalt(user));
+			
 			String encPassword = passwordEncoder.encodePassword(user.getPassword(), user.getUsername()); 
 			user.setPassword(encPassword);  
 			genericDao.update(user);
-			
-			// TODO Send a Welcome Mail .. !!!
-			
 		}
 	}
 	
@@ -74,9 +76,17 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 	
 	
 	@Transactional
-	public void updateUser(User user) {
+	public void updateUser(User user, Boolean isPasswdChanged) {
 		if(user != null) {
-			genericDao.save(user);
+			genericDao.update(user);
+			
+			// new password encrypted ... 
+			if(isPasswdChanged) {
+				String encPassword = passwordEncoder.encodePassword(user.getPassword(), user.getUsername()); 
+				user.setPassword(encPassword);  
+				genericDao.update(user);
+			}
+			
 		}
 	}
 	
@@ -116,31 +126,60 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 	}
 	
 	
-
-	@Transactional
-	public void changePassword(String oldPassword, String newPassword) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public boolean userExists(String username) {
 		User user = readUser(username);
-		
-		if (user == null) {
+		if (user == null)
 			return false;
-		} else {
-			return true;
-		}
+
+		return true;
+	}
+	
+	
+	@Transactional
+	public void registerUser(User user) {
+		String passwd = user.getPassword();
+		
+		// Create User
+		this.createUser(user);
+		
+		// Send a Welcome Mail .. !!!
+		mailingService.sendSuccessfulRegistrationNotification(user, passwd);
 		
 	}
 	
 	
-	
+	@Transactional
+	public void resetUserCredentials(String emailId) {
+		
+		User user = this.readUserByEmailId(emailId);
+		if (user != null) {
+			String newPasswd = SecurityUtil.generateRandomPassword();
+			user.setPassword(newPasswd);
+			genericDao.update(user);
+			
+			// Now hash the password and update the user 
+			String encPassword = passwordEncoder.encodePassword(user.getPassword(), user.getUsername());
+			user.setPassword(encPassword);
+			genericDao.update(user);
+			
+			// Send Account Recovery Mail .. !!!
+			mailingService.sendAccountRecoveryNotification(user, newPasswd);
+		}
+	}
 	
 	/* UserDetailsService Methods */
 	
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-		User user = this.readUser(username);
+		User user = null;
+		
+		// Check for Email
+		if (username.contains("@"))
+			user = this.readUserByEmailId(username);
+		
+		// Check for Username
+		if(user == null)
+			user = this.readUser(username);
+		
 		return user;
 	}
 
@@ -149,13 +188,16 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 	/* On Context Refresh */
 	
 	@Transactional
-	public void refreshStandardUsers() {
+	public void refreshAndUpdateStandardUsers() {
+		
+		// TODO Change this to something else .... 
 		
 		// Administrator 
+		
 		User admin = this.readUserByEmailId(EmailID.ADMIN);
 		if(admin == null) {
 			admin = new User();
-			admin.setFullName("Admin");
+			admin.setFullName("Administrator");
 			admin.setUsername(Constants.ADMIN_USERNAME);
 			admin.setPassword(Constants.ADMIN_PASSWORD);
 			admin.setEmailId(EmailID.ADMIN);
@@ -163,55 +205,22 @@ public class NativeUserDetailsServiceImpl implements UserService, ApplicationLis
 			this.createUser(admin);
 		}
 		
-		// Stitchemapp
-		User sta = this.readUserByEmailId(EmailID.STITCHEMAPP);
-		if(sta == null) {
-			sta = new User();
-			sta.setFullName("StitchemApp");
-			sta.setUsername(Constants.STA_USERNAME);
-			sta.setPassword(Constants.STA_PASSWORD);
-			sta.setEmailId(EmailID.STITCHEMAPP);
-			
-			this.createUser(sta);
-		}
-		
-		// Milli
-		User milli = this.readUserByEmailId(EmailID.TEST);
-		if(milli == null) {
-			milli = new User();
-			milli.setFullName("milli");
-			milli.setUsername("milli");
-			milli.setPassword("milli");
-			milli.setEmailId(EmailID.TEST);
-			
-			this.createUser(milli);
-		}		
-
-		
 	}
 	
 	
 	
 	/* Getters and Setters */
 	
-	public IDao getGenericDao() {
-		return genericDao;
-	}
-
 	public void setGenericDao(IDao genericDao) {
 		this.genericDao = genericDao;
-	}
-
-	public PasswordEncoder getPasswordEncoder() {
-		return passwordEncoder;
 	}
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	public MailingService getMailingService() {
-		return mailingService;
+	public void setSaltSource(SaltSource saltSource) {
+		this.saltSource = saltSource;
 	}
 
 	public void setMailingService(MailingService mailingService) {

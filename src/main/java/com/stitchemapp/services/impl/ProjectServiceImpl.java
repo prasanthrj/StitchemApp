@@ -33,7 +33,8 @@ public class ProjectServiceImpl implements ProjectService {
 		if(project != null) {
 			
 			// Save Layout
-			if(!(project.getProjectType().equals(ProjectType.Custom))) {
+			if(project.getProjectType() != null && 
+					!(project.getProjectType().equals(ProjectType.Custom))) {
 				
 				Layout layout = project.getLayout();
 				if(layout == null)
@@ -73,7 +74,8 @@ public class ProjectServiceImpl implements ProjectService {
 	public void updateProject(Project project) {
 		if(project != null) {
 			
-			if(!(project.getProjectType().equals(ProjectType.Custom))) {
+			if(project.getProjectType() != null && 
+					!(project.getProjectType().equals(ProjectType.Custom))) {
 			
 				if(project.getProjectType().height() != project.getLayout().getHeight() 
 						|| project.getProjectType().width() != project.getLayout().getWidth() ) {

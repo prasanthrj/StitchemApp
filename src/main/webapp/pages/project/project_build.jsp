@@ -22,6 +22,8 @@
 	var projectWidth = parseInt('<s:property value="project.layout.width" />');
 	var projectHeight = parseInt('<s:property value="project.layout.height" />');
 	
+	var projectType = '<s:property value="project.projectType" />';
+	
 	var scaledWidth = projectWidth;
 	var scaledHeight = projectHeight;
 	
@@ -57,15 +59,22 @@
 	
 	$(document).ready( function() {
 		
+		var scaledDims = calculateScaledDimentionsForBuild(projectType, projectWidth, projectHeight);
+		
 		$('.scaled-width').css({ 'width' : scaledWidth + 'px' });
 		$('.scaled-height').css({ 'height' : scaledHeight + 'px' });
 		
+		$('#screen-imgs-cont').css({
+			'width' : scaledWidth + 'px',
+			'height' : scaledHeight + 'px',
+			'overflow' : 'hidden'
+		});
 		
 		
 		/* Setting initial Visible Items ... */
 		var mainCont = $('#main-cont');
-		if(currNoOfPages != 0) {
-			mainCont.show();
+		if(currNoOfPages == 0) {
+			toggleBuildOptionsVisibility(false);
 		}
 		
 		
@@ -230,7 +239,7 @@
 		
 		/* Supporting Images */
 
-		$('.delete-support-image-btn').live('click', function(){
+		$('.delete-support-image-btn').live('click', function() {
 			var btn = $(this);
 			
 			var form = btn.parents('form:first');
@@ -288,6 +297,21 @@
 	
 	
 	/* Functions */
+	
+	function toggleBuildOptionsVisibility(showOptions) {
+		var mainCont = $('#main-cont');
+		var pageFunctions = $('.page-function');
+		
+		if(showOptions){
+			mainCont.show();
+			pageFunctions.show();
+			
+		} else {
+			mainCont.hide();
+			pageFunctions.hide();
+			
+		}
+	};
 	
 	function resetBuildPage() {
 		
@@ -356,7 +380,7 @@
 	
 	function loadPageScreenDetails( page ) {
 		
-		$('#main-cont').show();
+		toggleBuildOptionsVisibility(true);
 		
 		/* Screen info */
 		
@@ -520,6 +544,10 @@
 						} else {
 							landingPagePkeyInp.attr('value', '');
 						}
+						
+						// Update the landing page li 
+						$('#pages-list li').removeClass('curr-landing-page');
+						$('#car-page-' + landingPagePkey).addClass('curr-landing-page');
 						
 					}
 				}
@@ -781,7 +809,7 @@
 				</s:if>
 			</ul>
 			<s:else>
-				<div id="no-pages-cont">
+				<div id="no-items-cont">
 					<a href="javascript:void(0);" class="plus-icon float-left" title="click to upload screen images" 
 						onclick="openFileUploader({'imageFileType':'screen'});" > Upload Screens </a>
 					<label class=""> or drop them here</label>
@@ -791,7 +819,7 @@
 		</div>
 			
 		<div id="build-nav-cont" class="">
-			<div id="page-title-cont" class="float-left" style="padding: 1px 15px;">
+			<div id="page-title-cont" class="float-left page-function" style="padding: 1px 15px;">
 				<a href="javascript:void(0)" class="curr-page-title float-left margin-5px " title="click to rename the screen" 
 					onclick="preparePageTitleEditPopUp(this)"> Page Title </a>
 			</div>
@@ -808,11 +836,11 @@
 				<ul id="page-options-list" class="inline-list">
 					
 					<li id="" class="">
-						<a href="javascript:void(0)" class="screen-icon" title="replace the current screen image"
+						<a href="javascript:void(0)" class="screen-icon page-function" title="replace the current screen image"
 							id="page-screen-btn" onclick="preparePageReplace();"> replace </a>
 					</li>
 					<li id="" class="">
-						<a href="javascript:void(0)" class="bin-icon" title="delete the screen completely"
+						<a href="javascript:void(0)" class="bin-icon page-function" title="delete the screen completely"
 							id="page-delete-btn" onclick="preparePageDeletePopUp();"> delete </a>
 					</li>
 					

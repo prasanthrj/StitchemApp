@@ -10,8 +10,9 @@
 
 
 	<sec:http auto-config="false" access-denied-page="/home" entry-point-ref="authenticationProcessingFilterEntryPoint">
+		<sec:custom-filter position="FORM_LOGIN_FILTER" ref="authenticationProcessingFilter" />
 		<sec:custom-filter position="PRE_AUTH_FILTER" ref="nativePreAuthenticationFilter"/>
-
+		
 		<sec:intercept-url pattern="/themes/**" filters="none" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 		<sec:intercept-url pattern="/scripts/**" filters="none" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 		<sec:intercept-url pattern="/image/**" filters="none" access="IS_AUTHENTICATED_ANONYMOUSLY" />
@@ -40,9 +41,11 @@
 		<sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
 		
 		<!-- form login -->
+		<!-- 
 		<sec:form-login login-page="/home" login-processing-url="/login/authenticate" 
 				default-target-url="/user/home" always-use-default-target="false" 
 				authentication-failure-url="/home" />
+		 -->
 		
 		<!-- logout -->
 		<sec:logout logout-url="/j_spring_security_logout" logout-success-url="/home" />
@@ -73,30 +76,45 @@
 	<!-- PreAuthentication Filter -->
 	
 	<bean id="nativePreAuthenticationFilter" class="com.stitchemapp.security.impl.NativePreAuthenticationFilter">
-		<property name="abstractAuthenticationFactory" ref="abstractAuthenticationFactory"/>
+		<property name="authenticationProviderFactory" ref="authenticationProviderFactory"/>
 	</bean>
 	
 	
+	<!-- FORM LOGIN : Authentication Processing Filter -->
+	
+	<bean id="authenticationProcessingFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+		<property name="authenticationManager" ref="authenticationManager"/>
+	    <property name="filterProcessesUrl" value="/login/authenticate"/>
+		<property name="authenticationSuccessHandler" ref="ajaxAuthSuccessHandler" />
+		<property name="authenticationFailureHandler" ref="ajaxAuthFailureHandler" />
+	</bean>
+	
+	<bean id="ajaxAuthSuccessHandler" class="com.stitchemapp.security.impl.AjaxAuthenticationSuccessHandler">
+	    <property name="defaultTargetUrl" value="/user/home"/>
+	</bean>
+	
+	<bean id="ajaxAuthFailureHandler" class="com.stitchemapp.security.impl.AjaxAuthenticationFailureHandler" />
 	
 	
 	<!-- Authentication Providers and Password Hashing -->
 	
 	<bean id="daoAuthenticationProvider" class="com.stitchemapp.security.impl.NativeDaoAuthenticationProvider">
 		<property name="userDetailsService" ref="userService"/>
-		<property name="saltSource">
-			<bean class="org.springframework.security.authentication.dao.ReflectionSaltSource">
-				<property name="userPropertyToUse" value="username" />
-			</bean>
-		</property>
+		<property name="saltSource" ref="saltSource" />
 		<property name="passwordEncoder" ref="passwordEncoder" />
 	</bean>
 	
     <bean id="userService" name="userAuthenticationProvider" class="com.stitchemapp.security.impl.NativeUserDetailsServiceImpl">
 		<property name="genericDao" ref="genericDao" />
 		<property name="passwordEncoder" ref="passwordEncoder" />
+		<property name="saltSource" ref="saltSource" />
 		<property name="mailingService" ref="mailingService" />
   	</bean>
   	
+  	<bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+		<property name="userPropertyToUse" value="username" />
+	</bean>
+			
   	<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
 		<constructor-arg index="0" value="256" />
 	</bean>

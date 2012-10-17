@@ -32,9 +32,8 @@
 		
 		// Analytics .. 
 		
-		
 	});
-		
+
 	</script>
 	
 	<!-- this has to be below as it needs "contextPath" -->
@@ -55,7 +54,6 @@
 <%-- 	</section> --%>
 		
 	<%= request.getAttribute("docToPublish")  %>
-	
 	
 	<s:if test="%{isIframe == true}">
 		<script type="text/javascript">

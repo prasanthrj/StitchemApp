@@ -21,8 +21,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.stitchemapp.api.IDao;
-import com.stitchemapp.constants.EmailID;
-import com.stitchemapp.constants.EmailSubject;
 import com.stitchemapp.entities.HotSpot;
 import com.stitchemapp.entities.Layout;
 import com.stitchemapp.entities.Page;
@@ -129,49 +127,17 @@ public class PublishingServiceImpl implements PublishingService {
 	}
 	
 	
-	public void broadcastProjectPublishingDetailsToUsers(Project project, String HostURL){
-		
+	@Transactional
+	public void publishProjectDetailsAndUpdateAppUsers(Project project, String HostURL, List<User> appUsers){
 		if (project != null) {
-			
+
 			PublishDetails publishDetails = project.getPublishDetails();
+			// TODO can we something here with the publish details 
 			
-			String from = EmailID.DO_NOT_REPLY;
-			String to = "";
-			String subject = EmailSubject.PROJECT_PUBLISH + ": " + project.getTitle();
 			
-			String body = "";
+			// Send invites
+			mailingService.sendProjectViewInvitesToUsers(project, appUsers);
 			
-			List<User> appUsers = project.getAppUsers();
-			if (appUsers == null)
-				appUsers = new ArrayList<User>();
-			
-			for (User appUser : appUsers) {
-				
-				to = appUser.getEmailId();
-				
-				body += publishDetails.getNotes();
-				
-				body += "\n\n Use the below URL to view the app in mobile : \n";
-				body += HostURL + "/publish/mobile?project.pkey=" + project.getPkey().toString() + "&appUser.pkey=" + appUser.getPkey();
-				
-				body += "\n\n Use the below URL to view the app in desktop : \n";
-				body += HostURL + "/publish/web?project.pkey=" + project.getPkey().toString() + "&appUser.pkey=" + appUser.getPkey();
-				
-				if (publishDetails.getPassKey() != null && publishDetails.getPassKey() != "") {
-					
-					body += "\n\n Use this below passkey whenever required : \n";
-					body += publishDetails.getPassKey();
-					
-				}				
-				
-				body += "\n\n\n Thanks & Best regards, \n -StichemApp Team";
-				
-//				mailingManager.sendHtmlMail(from, to, subject, body);
-				mailingService.sendTextMail(from, to, subject, body);
-				
-				body = "";
-					
-			}
 		}
 
 	}
@@ -179,11 +145,7 @@ public class PublishingServiceImpl implements PublishingService {
 	
 	
 	
-	/* Utils */
-	
-	/* HTML parsers */
-	
-	// Project Publishing ...
+	/* HTML Rendering */
 	
 	public Document renderHTMLforMobileProject(Project project) throws ParserConfigurationException {
 		
@@ -421,24 +383,12 @@ public class PublishingServiceImpl implements PublishingService {
 	/* Getters and Setters */
 	
 
-	public IDao getGenericDao() {
-		return genericDao;
-	}
-
 	public void setGenericDao(IDao genericDao) {
 		this.genericDao = genericDao;
 	}
 	
-	public ProjectService getProjectService() {
-		return projectService;
-	}
-
 	public void setProjectService(ProjectService projectService) {
 		this.projectService = projectService;
-	}
-
-	public MailingService getMailingService() {
-		return mailingService;
 	}
 
 	public void setMailingService(MailingService mailingService) {

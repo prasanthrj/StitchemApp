@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.stitchemapp.entities.SocialDetails;
 import com.stitchemapp.entities.User;
+import com.stitchemapp.enums.MessageType;
 import com.stitchemapp.security.SocialAuthenticationProvider;
 import com.stitchemapp.security.SocialConnectionService;
 import com.stitchemapp.security.SocialUserDetailsService;
@@ -25,45 +26,67 @@ public class UserAction extends GenericActionSupport implements ApplicationConte
 	private User user;
 	private SocialDetails socialDetails;
 	
+	private String newPassword;
+	
 	
 	@Override
 	public void prepare() throws Exception {
 		super.prepare();
 		
 		// User
+		/*
 		String userEmailId = this.request.getParameter("user.emailId");
         if (userEmailId != null && StringUtils.isNotEmpty(userEmailId)){
             user = userService.readUserByEmailId(userEmailId);
         }
-        
+		*/
+		
+		String userPkey = this.request.getParameter("user.pkey");
+        if (userPkey != null && StringUtils.isNotEmpty(userPkey)){
+            user = userService.readUser(Integer.valueOf(userPkey));
+        }
+         
 		
 	}
 	
 	public String registerUser(){
+		if(user == null || user.getEmailId() == null ) 
+			return ERROR;
 		
-		if(user != null && user.getEmailId() != null ){
+		User userBean = new User();
+		userBean.setUsername(user.getUsername());
+		userBean.setPassword(user.getPassword());
+		userBean.setEmailId(user.getEmailId());
+		
+		try {
+			// Registering..
+			userService.registerUser(user);
 			
-			if(user.getPkey() != null) {
-				super.userService.updateUser(user);
-			} else {
-				super.userService.createUser(user);
+		} catch (Exception e) {
+			e.printStackTrace();
+			String errorMsg = e.getCause().getCause().getMessage();
+			if(errorMsg.contains("user_name")) {
+				messageBean.setMessage("username");
+			} else if(errorMsg.contains("email_id")) {
+				messageBean.setMessage("emailid");
 			}
 			
-			if (socialDetails != null && socialDetails.getProviderId() != null) {
-				
-				String authProvider = socialDetails.getProviderId().toString();
-					
-				SocialAuthenticationProvider authenticationProvider = (SocialAuthenticationProvider) applicationContext.getBean(authProvider);
-				SocialConnectionService socialConnectionManager = authenticationProvider.getSocialConnectionService();
-				
-				socialDetails = socialConnectionManager.fetchBasicSocialDetails();
-				socialDetails.setUser(user);
-				
-				// Save Social Details ..
-				socialUserDetailsService.createSocialDetails(socialDetails);					
-
-			}
+			messageBean.setMessageType(MessageType.error);
+			return SUCCESS;
+		}
+		
+		if (socialDetails != null && socialDetails.getProviderId() != null) {
 			
+			String authProvider = socialDetails.getProviderId().toString();
+				
+			SocialAuthenticationProvider authenticationProvider = (SocialAuthenticationProvider) applicationContext.getBean(authProvider);
+			SocialConnectionService socialConnectionManager = authenticationProvider.getSocialConnectionService();
+			
+			socialDetails = socialConnectionManager.fetchBasicSocialDetails();
+			socialDetails.setUser(user);
+			
+			// Save Social Details ..
+			socialUserDetailsService.createSocialDetails(socialDetails);					
 		}
 		
 		// on Successful User creation, set Authentication 
@@ -71,9 +94,44 @@ public class UserAction extends GenericActionSupport implements ApplicationConte
 		
 		SecurityUtil.signInUser(user);
 		super.prepareLoggedinUserDetails();
-						
+
 		return SUCCESS;
 	}
+	
+	
+	public String resetUserPassword() {
+		if (user == null || user.getEmailId() == null)
+			return ERROR;
+		
+		// TODO reset Password 
+		userService.resetUserCredentials(user.getEmailId());
+		
+		messageBean.setMessageType(MessageType.status);
+		messageBean.setMessage("Password has been sent !!!");
+
+		return SUCCESS;
+	}
+	
+	public String updateUserProfile() {
+		if (user == null || user.getPkey() == null)
+			return ERROR;
+		
+		Boolean isPasswdChanged = false;
+		
+		if(newPassword != null && !newPassword.isEmpty()) {
+			isPasswdChanged = true;
+			user.setPassword(newPassword);
+		}
+		
+		userService.updateUser(user, isPasswdChanged);
+		
+		return SUCCESS;
+	}
+	
+	
+	
+	
+	
 		
 
 	
@@ -108,8 +166,7 @@ public class UserAction extends GenericActionSupport implements ApplicationConte
 		return socialConnectionService;
 	}
 
-	public void setSocialConnectionService(
-			SocialConnectionService socialConnectionService) {
+	public void setSocialConnectionService(SocialConnectionService socialConnectionService) {
 		this.socialConnectionService = socialConnectionService;
 	}
 
@@ -127,6 +184,14 @@ public class UserAction extends GenericActionSupport implements ApplicationConte
 
 	public void setSocialDetails(SocialDetails socialDetails) {
 		this.socialDetails = socialDetails;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
 	}
 	
 	

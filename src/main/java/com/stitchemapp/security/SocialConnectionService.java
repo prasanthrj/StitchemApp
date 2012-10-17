@@ -1,23 +1,15 @@
 package com.stitchemapp.security;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts2.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.stitchemapp.entities.SocialDetails;
 import com.stitchemapp.entities.User;
-import com.stitchemapp.enums.SocialAuthProvider;
 
 public interface SocialConnectionService {
-	
-	
 	
 	/* SocialUser Connection related */
 	
 	void initializeWithAccessToken(String authProviderUrl, String accessToken);
-	
-	
 	
 	
 	/* User Related */
@@ -25,12 +17,9 @@ public interface SocialConnectionService {
 	User findUserBySocialDetails(SocialDetails inSocialDetails);
 	
 	
-	
 	/* SocialUser Related */
 	
 	SocialDetails findOrCreateSocialUser();
-	
-	
 	
 	
 	/* inWard Connection Related */
@@ -50,15 +39,9 @@ public interface SocialConnectionService {
 	String searchBasicProfile(String sortType, Integer startIndex, Integer count);
 	
 	
-	
-	
 	/* outWard Connection Related */
 		
 	void postToSocialProviderFeed(String comment);
 	
 	
-	
-	
-
-
 }

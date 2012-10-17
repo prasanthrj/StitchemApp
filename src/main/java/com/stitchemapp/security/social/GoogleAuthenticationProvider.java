@@ -52,7 +52,6 @@ public class GoogleAuthenticationProvider implements SocialAuthenticationProvide
 		String requestCode = request.getParameter(Constants.REQ_CODE_PARAMETER);
 		
     	try{
-    	
             if (request.getParameter("error_reason") != null) {
                 LOGGER.error("Error: " + request.getParameter("error_description"));
                 
@@ -74,10 +73,8 @@ public class GoogleAuthenticationProvider implements SocialAuthenticationProvide
                         request.getSession().setAttribute(Constants.AUTH_PROVIDER_PARAMETER, SocialAuthProvider.Google);
                         
                     }
-                    
                 }
             }
-        
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -146,46 +143,24 @@ public class GoogleAuthenticationProvider implements SocialAuthenticationProvide
 	
 	/* Some Other Getters and Setters for Fields */
 	
-	public String getConsumerKey() {
-		return consumerKey;
-	}
-
 	public void setConsumerKey(String consumerKey) {
 		this.consumerKey = consumerKey;
-	}
-
-	public String getConsumerSecret() {
-		return consumerSecret;
 	}
 
 	public void setConsumerSecret(String consumerSecret) {
 		this.consumerSecret = consumerSecret;
 	}
 
-	public String getAuthProviderUrl() {
-		return authProviderUrl;
-	}
-
 	public void setAuthProviderUrl(String authProviderUrl) {
 		this.authProviderUrl = authProviderUrl;
-	}
-
-	public String getScope() {
-		return scope;
 	}
 
 	public void setScope(String scope) {
 		this.scope = scope;
 	}
 
-	public String getCallBackUri() {
-		return callBackUri;
-	}
-
 	public void setCallBackUri(String callBackUri) {
 		this.callBackUri = callBackUri;
 	}
-	
-	
 
 }

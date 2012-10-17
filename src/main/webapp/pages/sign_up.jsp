@@ -12,6 +12,59 @@
 	
 	<style type="text/css">
 	
+	/* Register */
+
+	#signup-cont {
+		margin: 0 auto;
+		width: 640px;
+	}
+	
+	#signup-list {
+		margin: 30px auto !important;
+		width: 442px;
+	}
+	
+	#signup-list li {
+		overflow: hidden;
+	}
+	
+	#signup-list input {
+		width: 430px;
+		height: 42px;
+		font-size: 16px;
+		margin: 4px 0;
+	}
+	
+	#signup-list input[type=password] {
+		width: 205px;
+	}
+	
+	#signup-list input[type=submit] {
+		width: 440px;
+	}
+	
+	#signup-list label {
+		font-size: 14px;
+	    margin: 8px 16px;
+	    min-width: 150px;
+	    text-align: right;
+	}
+	
+	#signup-fb {
+		background: url("themes/images/fb-light.png") no-repeat scroll center center transparent;
+		background-color: rgba(73, 130, 182, 1);
+	}
+	
+	#signup-gg {
+		background: url("themes/images/google-light.png") no-repeat scroll center center transparent;
+		background-color: rgba(225, 53, 85, 1);
+	}
+	
+	#signup-tw {
+		background: url("themes/images/twitter-light.png") no-repeat scroll center center transparent;
+		background-color: rgba(71, 213, 229, 1);
+	}
+	
 	#ext-signup {
 		border: none;
 		border-bottom: 1px solid #CCCCCC;
@@ -88,6 +141,12 @@
 		box-shadow: 0px 0px 1px 1px #44D5E9 inset;
 	}
 	
+	#native-signup-cont {
+		position: relative;
+		overflow: hidden;
+		padding: 10px;
+	}
+	
 	</style>
 	
 	<script type="text/javascript" >
@@ -112,9 +171,8 @@
 				onValidForm : function(form){
 					var pswd = $('#user-pswd');
 					var cnfPswd = $('#user-confirm-pswd');
-					
 					if(pswd.val() == cnfPswd.val()) {
-						$(form).trigger('submit');	
+						submitRegistrationForm();
 					} else {
 						pswd.addClass('error');
 						cnfPswd.addClass('error');
@@ -125,9 +183,40 @@
 			
 		});
 		
-		
-		
+		$('#user-registration-form input').bind('focus', function(){ 
+			this.select();
+		});
+
 	});
+	
+	// Registration Form .. 
+	function submitRegistrationForm() {
+		$('#user-registration-form').ajaxForm({
+			type: "POST",
+			beforeSubmit : function() {
+				$('body').css({	'cursor': 'progress' });
+			},
+			success : function(data) {
+				$('body').css({	'cursor': 'auto' });
+				if(data && data.messageBean) {
+					var msg = data.messageBean;
+					if(msg.messageType == 'error') {
+						if(msg.message == 'username') {
+							showNotificationMsg("error", "We are sorry. this username is already taken !!!", false );
+							$('#reg-username').focus().select();
+						} else if(msg.message == 'emailid') {
+							showNotificationMsg("status", "This emailid is already registered !!!", false );
+							$('#reg-emailid').focus().select();
+						}
+					} else {
+						window.location.href = 'user/home';
+					}
+				} 
+			},
+			complete : function(data) {}
+		}).trigger('submit');
+	};
+	
 	</script>
 
 </head>
@@ -144,15 +233,6 @@
 		
 	<div id="main-cont">
 	
-		<div id="notification-cont" style="display: none;">
-			<div id="notification-box" class="error">
-				<a href="javascript:void" class="float-left skull-icon-white" id="noification-icon"></a>
-				<span class="msg-text"> Something Went Wrong !!! </span>
-				<a href="javascript:void(0);" class="float-right close-icon-white" id="noification-close"></a>
-			</div>
-		</div>
-		
-		 
 		<div id="signup-cont" class="float-fix">
 			
 			<div id="ext-signup" class="float-fix">
@@ -181,21 +261,31 @@
 				</ul>
 			</div>
 			
-			<div id="native-signup-cont">
+			<div id="native-signup-cont" class="">
+			
+				<div id="notification-cont" style="display: none;">
+					<div id="notification-box" class="error">
+						<a href="javascript:void" class="float-left skull-icon-white" id="noification-icon"></a>
+						<span class="msg-text"> Something Went Wrong !!! </span>
+						<a href="javascript:void(0);" class="float-right close-icon-white" id="noification-close"></a>
+					</div>
+				</div>
+				
+			
 				<form action="<%= request.getContextPath() %>/user/register" id="user-registration-form" method="post">
-						
+
 					<!-- Social Details -->
 					<input type="hidden" name="socialDetails.providerId" value="<s:property value="socialDetails.providerId"/>">
 					
 					<ul id="signup-list">
 						<li>
-							<input type="text" class="mandatory" name="user.fullName" value="<s:property value="socialDetails.displayName"/>" placeholder="name">
+							<input type="text" class="mandatory" name="user.fullName" value="<s:property value="socialDetails.fullName"/>" placeholder="Full Name">
 						</li>
 						<li>
-							<input type="email" class="mandatory emailId" name="user.emailId" value="<s:property value="socialDetails.emailId"/>" placeholder="email-id">
+							<input type="email" id="reg-emailid" class="mandatory emailId" name="user.emailId" value="<s:property value="socialDetails.emailId"/>" placeholder="email-id">
 						</li>
 						<li>
-							<input type="text" class="mandatory" name="user.username" value="" placeholder="username">
+							<input type="text" id="reg-username" class="mandatory" name="user.username" value="" placeholder="username">
 						</li>
 						<li>
 							<input type="password" id="user-pswd" name="user.password" value="" placeholder="password" class="mandatory float-left" >

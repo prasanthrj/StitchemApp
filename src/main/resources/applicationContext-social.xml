@@ -20,7 +20,7 @@
 	
 	<!-- Social Authentication -->
 	
-	<bean id="abstractAuthenticationFactory" class="com.stitchemapp.security.impl.SocialAuthenticationFactoryImpl" scope="session" >
+	<bean id="authenticationProviderFactory" class="com.stitchemapp.security.impl.SocialAuthenticationProviderFactoryImpl" scope="session" >
 		<aop:scoped-proxy/>
 	</bean>
 	

@@ -5,15 +5,13 @@
 
 <!DOCTYPE HTML>
 <html>
-
 <head>
 
 	<title> Contact Us </title>
 	
 	<script type="text/javascript" >
-	
 	$(document).ready( function() {
-		
+
 		/* Window resize related ... */
 		
 		adjustToWindowDimentions(); 
@@ -23,54 +21,38 @@
 		});
 		
 		
-		
-		
-		
-		
-		
 	});
+	
 	
 	/* Window resize */
 	
 	function adjustToWindowDimentions(){
 		adjustBodyToWindowDimensions();		// body .. 
-		
-		
-		
+	
 	};
 	
 	</script>
 
 </head>
-
 <body>
 
 	<!-- Body Content -->
 
 	<div id="top-cont" class="yellow-bg">
 		<div id="page-title-cont" class="float-left">
-			<label class="page-title"> Contact Us </label>		
+			<label class="page-title"> About Us </label>		
 		</div>
 	</div>
-		
+
 	<div id="main-cont"> 
-	
 		<div>
 		
 		
 		</div>
-		
-	
 	</div>   
 	
 	<section class="pop-ups-cont">
 	
 	</section>
-	
 </body>
-
 </html>		
-
-
-
-

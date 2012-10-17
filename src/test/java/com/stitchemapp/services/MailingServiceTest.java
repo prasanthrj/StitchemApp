@@ -1,7 +1,11 @@
 package com.stitchemapp.services;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -22,51 +26,77 @@ public class MailingServiceTest {
 	@Autowired
 	private MailingService _mailingService;
 	
-	
 	/* Local Variables and Constants  */
 	
-
+	private static final String mailTmplDir = "/home/milli/Dropbox/Imaginea/NightOut/App Fusion/StitchemApp/src/main/resources/Mail-Tmpl/";
+	private static final String sampleTmpl = "project_view_invite.html";
+ 
 	
 	/* Test Cases */
 	
 	@Before
 	public void beforeTests() {
 		
+		
 	}
 	
+	
+	@Test
+	public void testTemplates() throws IOException {
+		
+		File templateFile = new File(mailTmplDir + sampleTmpl);
+		String content = FileUtils.readFileToString(templateFile,null);
+		
+		Object[] arguments = new Object[3];
+		arguments[0] = "milli";
+		arguments[1] = "IPhone";
+		arguments[2] = "2";
+
+		content = MessageFormat.format(content, arguments);
+		LOGGER.info(content);
+
+	}
+	
+	
+	@Test
 	public void testSimpleMailing(){
 		
-		String from = "";
-//		String to = "asdfsddfj@gmail.com";
-//		String to = "gowri.shankar.8488@gmail.com";
-		String to = "paraniraja@gmail.com";
+		String from = "gowri.shankar.8488@gmail.com";
+		String to = "gowri.shankar.8488@gmail.com";
 		String subject = " Test Mail";
 		String body = "Test Mail" + new Date().toString();
 		
-//		_mailingManager.sendTextMail(from, to, subject, body);
+//		_mailingService.sendTextMail(from, to, subject, body);
+		
+		LOGGER.info("Test : Mail Sent");
 		
 	}
+	
 
+	@Test
 	public void testHtmlMailing(){
 		
-		String from = "";
-		String to = "gowrishankar.milli@gmail.com";
+		String from = "gowri.shankar.8488@gmail.com";
+		String to = "gowri.shankar.8488@gmail.com";
 		String subject = "Stitch'em App Test Mail";
-		String body = "Test Mail" + new Date().toString();
+		String body = "";
 		
-		body += "HTML Body :\n";
+		body += "\n<b>HTML Body :</b>";
 		
-//		_mailingManager.sendHtmlMail(from, to, subject, body);
 		
+//		_mailingService.sendHtmlMail(from, to, subject, body);
+		
+		LOGGER.info("Test : Mail Sent");
 	}
 
 	@After
 	public void afterTests() {
 		
+		
+		
 	}
-	
-	
-	
 
+
+	
 
 }

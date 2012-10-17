@@ -2,40 +2,31 @@ package com.stitchemapp.utils;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
+
 public class RequestUtils {
 	
-	
+	public static final Logger LOGGER = Logger.getLogger(RequestUtils.class);
 	
 	// Extract HostUrl from request ..	
-	
 	public static String fetchHostURL (HttpServletRequest request) {
 		
-		String hostUrl = "";
-		
+		String hostUrl = null;
 		if (request != null) {
-
+			hostUrl = "";
 			hostUrl += request.getScheme(); 
 			hostUrl += "://"; 
-			
-			String server = request.getServerName(); 
-			if (server.contains("localhost")) { 
-				server = "192.168.6.119"; 
-			} 
-			
-			hostUrl += server; 
+			hostUrl += request.getLocalAddr(); 
 			
 			if (request.getServerPort() != 80)
 				hostUrl += ":" + request.getServerPort();
 			
 			hostUrl += request.getContextPath();
-
 		}
 
-//		System.out.println(hostUrl);
-
 		return hostUrl;
-
 	}
+	
 	
 
 }

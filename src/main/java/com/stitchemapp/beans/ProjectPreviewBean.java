@@ -67,7 +67,7 @@ public class ProjectPreviewBean {
 
 	public ProjectType getProjectType() {
 		if(projectType == null)
-			projectType = ProjectType.Iphone3;
+			projectType = ProjectType.IPhone;
 		return projectType;
 	}
 

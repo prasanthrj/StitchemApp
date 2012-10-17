@@ -101,64 +101,37 @@ public class TwitterAuthenticationProvider implements SocialAuthenticationProvid
 	}
 	
 	
-	
-	
-	
-	
 	/* SocialConnection Manager */
 
 	public SocialConnectionService getSocialConnectionService() {
 		return socialConnectionService;
 	}
 
-	public void setSocialConnectionService(
-			SocialConnectionService socialConnectionService) {
+	public void setSocialConnectionService(SocialConnectionService socialConnectionService) {
 		this.socialConnectionService = socialConnectionService;
 	}
 
 	
 	/* Some Other Getters and Setters for Fields */
 	
-	public String getConsumerKey() {
-		return consumerKey;
-	}
-
 	public void setConsumerKey(String consumerKey) {
 		this.consumerKey = consumerKey;
-	}
-
-	public String getConsumerSecret() {
-		return consumerSecret;
 	}
 
 	public void setConsumerSecret(String consumerSecret) {
 		this.consumerSecret = consumerSecret;
 	}
 
-	public String getAuthProviderUrl() {
-		return authProviderUrl;
-	}
-
 	public void setAuthProviderUrl(String authProviderUrl) {
 		this.authProviderUrl = authProviderUrl;
-	}
-
-	public String getScope() {
-		return scope;
 	}
 
 	public void setScope(String scope) {
 		this.scope = scope;
 	}
 
-	public String getCallBackUri() {
-		return callBackUri;
-	}
-
 	public void setCallBackUri(String callBackUri) {
 		this.callBackUri = callBackUri;
 	}
-	
-	
 
 }

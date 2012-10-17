@@ -15,48 +15,52 @@
 	<!-- Object Factory -->
 	<constant name="struts.objectFactory" value="spring" />
 
+
 	<!-- Packages -->
 	
-	
-	<!-- Root  -->
-	
-	<package name="root" namespace="/" extends="json-default">
+	<package name="generic-package" extends="json-default">
 	
 		<result-types>
 			<result-type name="json" class="org.apache.struts2.json.JSONResult">
 				<param name="ignoreHierarchy">false</param>
 			</result-type>
 		</result-types>
-		
+	
 		<!-- Interceptors -->
-		
-		 <interceptors>
-            <interceptor-stack name="afDefaultStack">
-                <interceptor-ref name="defaultStack">
-                    <param name="exception.logEnabled">true</param>
-                    <param name="exception.logLevel">ERROR</param>
-                </interceptor-ref>
-            </interceptor-stack>
-        </interceptors>
-        <default-interceptor-ref name="afDefaultStack" />
-        
-	   
-	   <!-- Global Error -->
-	   
-	    <global-results>
-            <result name="runtime">/pages/error.jsp</result>
-        </global-results>
-       
-        <global-exception-mappings>
-            <exception-mapping result="runtime" exception="java.lang.RuntimeException" />
-            <exception-mapping result="runtime" exception="com.stitchemapp.exceptions.GenericException"/>
-            <exception-mapping result="runtime" exception="java.lang.Exception"/>
-        </global-exception-mappings>
-       
-       
-       
-		
-		
+	
+		<interceptors>
+			<interceptor-stack name="afDefaultStack">
+				<interceptor-ref name="defaultStack">
+					<param name="exception.logEnabled">true</param>
+					<param name="exception.logLevel">ERROR</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="afDefaultStack" />
+	
+	
+		<!-- Global Error -->
+
+		<global-results>
+			<result name="runtime">/pages/error.jsp</result>
+			<result name="pageNotFound">/pages/page_not_found.jsp</result>
+		</global-results>
+	
+		<global-exception-mappings>
+			<exception-mapping result="runtime" exception="java.lang.RuntimeException" />
+			<exception-mapping result="runtime" exception="java.lang.Exception" />
+			
+			<exception-mapping result="pageNotFound" exception="com.stitchemapp.exceptions.GenericException" />
+		</global-exception-mappings>
+	    
+	</package>
+	
+	
+	
+	<!-- Root  -->
+	
+	<package name="root" namespace="/" extends="generic-package">
+
 
 		<!-- Actions -->
 		
@@ -71,7 +75,7 @@
 		<action name="signin" class="homeAction" method="execute">
 			<result name="success">/pages/sign_in.jsp</result>
 		</action>
-		
+
 		<action name="signup" class="homeAction" method="prepareSignUp">
 			<result name="success">/pages/sign_up.jsp</result>
 			<result name="none" type="chain">
@@ -80,6 +84,13 @@
 	        </result>
 		</action>
 		
+		<action name="forgot_password" class="homeAction" method="prepareForgotPassword">
+			<result name="success">/pages/forgot_password.jsp</result>
+			<result name="none" type="chain">
+	            <param name="actionName">home</param>
+	            <param name="namespace">/user</param>
+	        </result>
+		</action>
 		
 	</package>
 	
@@ -87,7 +98,7 @@
 	
 	<!-- static pages related  -->
 	
-	<package name="static" namespace="/static" extends="json-default">
+	<package name="static" namespace="/static" extends="generic-package">
 		
 		<action name="about" class="homeAction" method="prepareStaticPage">
 			<result name="success">/pages/static/about_us.jsp</result>
@@ -97,21 +108,33 @@
 			<result name="success">/pages/static/contact_us.jsp</result>
 		</action>
 		
-		<action name="home" class="homeAction" method="prepareStaticPage">
-			<result name="success">/pages/home.jsp</result>
+		<action name="faq" class="homeAction" method="prepareStaticPage">
+			<result name="success">/pages/static/frequent_questions.jsp</result>
+		</action>
+		
+		<action name="terms" class="homeAction" method="prepareStaticPage">
+			<result name="success">/pages/static/terms_of_use.jsp</result>
+		</action>
+		
+		<action name="privacy" class="homeAction" method="prepareStaticPage">
+			<result name="success">/pages/static/privacy_policy.jsp</result>
 		</action>
 		
 	</package>
+
 	
 	
 	<!-- User Account related  -->
 	
-	<package name="account" namespace="/user" extends="json-default">
+	<package name="account" namespace="/user" extends="generic-package">
 		
 		<action name="register" class="userAction" method="registerUser">
-			<result type="chain" name="success">
-	            <param name="actionName">home</param>
-	        </result>
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer
+                </param>
+			</result>
 		</action>
 		
 		<action name="home" class="userAccountAction" method="prepareUserHome">
@@ -121,6 +144,24 @@
 		<action name="profile" class="userAccountAction" method="prepareUserProfile">
 			<result name="success">/pages/account/user_profile.jsp</result>
 		</action>
+		
+		<action name="reset_passwd" class="userAction" method="resetUserPassword">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer
+                </param>
+			</result>
+		</action>
+		
+		<action name="update_profile" class="userAction" method="updateUserProfile">
+			<result name="success" type="json">
+				<param name="includeProperties"> messageBean.*, </param>
+				<param name="excludeProperties">
+                    .*\.hibernateLazyInitializer
+                </param>
+			</result>
+		</action>
 	
 	</package>
 	
@@ -128,7 +169,7 @@
 	
 	<!-- Project related  -->
 	
-	<package name="project" namespace="/project" extends="json-default">
+	<package name="project" namespace="/project" extends="generic-package">
 		
 		<!-- 
 		<action name="info" class="projectAction" method="prepareProjectInfo">
@@ -166,7 +207,13 @@
 			
 		</action>
 		
+		<!-- 
 		<action name="publish_opts" class="projectAction" method="prepareProjectPublishDetails">
+			<result name="success">/pages/project/project_publish_details.jsp</result>
+		</action>
+		 -->
+		 
+		<action name="publish_opts" class="publishingAction" method="prepareProjectPublishDetails">
 			<result name="success">/pages/project/project_publish_details.jsp</result>
 		</action>
 		
@@ -203,7 +250,7 @@
 	
 	<!-- Project Builder related  -->
 	
-	<package name="projectBuilder" namespace="/project/build" extends="json-default">
+	<package name="projectBuilder" namespace="/project/build" extends="generic-package">
 	
 		<action name="prepare" class="screenBuilderAction" method="prepareProjectForBuild">
 			<result name="success">/pages/project/project_build.jsp</result>
@@ -360,7 +407,7 @@
 	
 	<!-- Project comments related  -->
 	
-	<package name="project-comments" namespace="/project/comment" extends="json-default">
+	<package name="project-comments" namespace="/project/comment" extends="generic-package">
 		
 		<action name="post" class="projectAction" method="postComment">
 			<result name="success" type="json">
@@ -386,7 +433,7 @@
 	
 	<!-- Project Publishing related  -->
 	
-	<package name="projectPublishing" namespace="/publish" extends="json-default">
+	<package name="projectPublishing" namespace="/publish" extends="generic-package">
 	
 		<action name="preview" class="publishingAction" method="generateProjectPreview">
 			<result name="success">/pages/publish/publish_preview.jsp</result>
@@ -446,7 +493,7 @@
 	
 	<!-- Images related -->
 	
-	<package name="image" namespace="/image" extends="json-default">
+	<package name="image" namespace="/image" extends="generic-package">
 		
 		<action name="view" class="screenBuilderAction" method="fetchProjectImage">
 			<result name="success" type="stream">
@@ -478,7 +525,7 @@
 	
 	<!-- Search related  -->
 	
-	<package name="search" namespace="/search" extends="json-default">
+	<package name="search" namespace="/search" extends="generic-package">
 	
 	
 	</package>
@@ -486,7 +533,7 @@
 	
 	<!-- Administrator related  -->
 	
-	<package name="administrator" namespace="/admin" extends="json-default">
+	<package name="administrator" namespace="/admin" extends="generic-package">
 	
 		<action name="home" class="contentAction" method="prepareAdminHome">
 			<result name="success">/pages/admin/admin_home.jsp</result>

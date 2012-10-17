@@ -277,3 +277,15 @@ function uploadFile( inFile, projectPkey, onStart, progress, onError, onAbort, o
 		
 	}
 };
+
+
+function calculateScaledDimentionsForBuild(projectType, projectWidth, projectHeight) {
+	if(projectType) {
+		
+		
+	}
+};
+
+
+
+

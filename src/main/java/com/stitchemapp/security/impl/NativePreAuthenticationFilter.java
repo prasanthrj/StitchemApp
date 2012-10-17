@@ -22,7 +22,7 @@ public class NativePreAuthenticationFilter extends AbstractPreAuthenticatedProce
 
 	private static final Logger logger = LoggerFactory.getLogger(NativePreAuthenticationFilter.class);
 	
-	private AbstractAuthenticationProviderFactory abstractAuthenticationFactory;
+	private AbstractAuthenticationProviderFactory authenticationProviderFactory;
 	
 	private SocialAuthenticationProvider authenticationSource;
 	private String exceptionUrlPattern;
@@ -36,14 +36,16 @@ public class NativePreAuthenticationFilter extends AbstractPreAuthenticatedProce
 	@Override
 	protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		return null;
+		return request.getParameter("j_username");
 	}
+	
 	@Override
 	protected Object getPreAuthenticatedCredentials(HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		return null;
+		return request.getParameter("j_password");
 	}
 
+	/*
 	
 	private String extractPassword(HttpServletRequest request) {
 		return request.getParameter("j_password");
@@ -52,7 +54,8 @@ public class NativePreAuthenticationFilter extends AbstractPreAuthenticatedProce
 	private String extractUsername(HttpServletRequest request) {
 		return request.getParameter("j_username");
 	}
-
+	
+	*/
 	
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		
@@ -64,21 +67,17 @@ public class NativePreAuthenticationFilter extends AbstractPreAuthenticatedProce
 
 		if (requiresPreAuthenticationSetUp(httpServletRequest)) {
 			
-			authenticationSource = abstractAuthenticationFactory.getSocialAuthProviderInstance(httpServletRequest);
+			authenticationSource = authenticationProviderFactory.getSocialAuthProviderInstance(httpServletRequest);
 			if(authenticationSource != null) {
-				
 				authenticationSource.authenticateAtProviderForAccessToken( httpServletRequest, httpServletResponse );
 
 				if (httpServletRequest.getSession(true).getAttribute(Constants.AUTH_PROVIDER_PARAMETER) != null ) {
 					chain.doFilter(request, response);
 				}
-				
 			}
 			
 		} else {
-		
 			chain.doFilter(request, response);
-		
 		}
 		
 	}
@@ -94,7 +93,7 @@ public class NativePreAuthenticationFilter extends AbstractPreAuthenticatedProce
 			return true;
 		
 		return false;
-		
+
 	}
 	
 
@@ -106,23 +105,14 @@ public class NativePreAuthenticationFilter extends AbstractPreAuthenticatedProce
 	
 	
 	/* Getters and Setters */
-
-	public AbstractAuthenticationProviderFactory getAbstractAuthenticationFactory() {
-		return abstractAuthenticationFactory;
-	}
-
-	public void setAbstractAuthenticationFactory(AbstractAuthenticationProviderFactory abstractAuthenticationFactory) {
-		this.abstractAuthenticationFactory = abstractAuthenticationFactory;
-	}
 	
-	public String getExceptionUrlPattern() {
-		return exceptionUrlPattern;
+	public void setAuthenticationProviderFactory(
+			AbstractAuthenticationProviderFactory authenticationProviderFactory) {
+		this.authenticationProviderFactory = authenticationProviderFactory;
 	}
 
 	public void setExceptionUrlPattern(String exceptionUrlPattern) {
 		this.exceptionUrlPattern = exceptionUrlPattern;
 	}
-	
-
 
 }

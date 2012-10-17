@@ -10,6 +10,40 @@
 
 	<title> User Home </title>
 	
+	<style type="text/css">
+
+	.blue-link {
+		color: blue !important;	
+	}
+	
+	#profile-edit-cont {
+		margin: 0 100px;
+		padding: 15px 32px 20px;
+		border-bottom: 1px dotted #CCCCCC;
+		color: #333333;
+		line-height: 16px;
+		background-color: #FCFCFC;
+	}
+	
+	#profile-edit-cont li {
+		overflow: hidden;
+		margin: 2px 0;
+	}
+	
+	#profile-edit-cont label {
+		display: block;
+		clear: both;
+		margin: 2px;
+		font-weight: bold;
+	}
+	
+	#profile-edit-cont input {
+		clear: both;
+		float: left;
+	}
+
+	</style>
+	
 	<script type="text/javascript" >
 	
 	$(document).ready( function() {
@@ -20,7 +54,6 @@
 		$(window).resize(function() {
 			adjustToWindowDimentions(); 
 		});
-		
 		
 		
 		/* Tags */
@@ -61,10 +94,59 @@
 					$(form).trigger('submit');
 				}
 			});
-			
 		});
 		
+		$('#profile-edit-cont input').bind('focus', function(){
+			$(this).removeClass('error');
+			this.select();
+		});
 		
+		var editProfileCont = $('#profile-edit-cont');
+		var editProfileBtn = $('#edit-profile-btn');
+		
+		editProfileBtn.live('click', function(){
+			editProfileCont.slideDown('slow');
+			editProfileBtn.hide('fade');
+		});
+		
+		$('#profile-edit-cont .cancel-edit-btn').live('click', function(){
+			editProfileCont.slideUp('slow');
+			editProfileBtn.show('fade');
+		});
+		
+		$('#profile-submit-btn').live('click', function(){
+			var newPasswdInp = $('#user-pswd');
+			var newConfPasswdInp = $('#user-confirm-pswd');
+			
+			var newPasswd = newPasswdInp.val();
+			var newConfPasswd = newConfPasswdInp.val();
+			if(newPasswd && newPasswd != '') {
+				if(newPasswd != newConfPasswd) {
+					newPasswdInp.addClass('error');
+					newConfPasswdInp.addClass('error');
+					return;
+				}
+			}
+			
+			$('#user-profile-form').ajaxForm({
+				type: "POST",
+				beforeSubmit : function() {
+					$('body').css({	'cursor': 'progress' });
+				},
+				success : function(data) {
+					$('body').css({	'cursor': 'auto' });
+					if(data && data.messageBean) {
+						var msg = data.messageBean;
+						if(msg.messageType == 'error') {
+
+						} else {
+							window.location.reload(true);
+						}
+					} 
+				},
+				complete : function(data) {}
+			}).trigger('submit');
+		});
 		
 	});
 	
@@ -79,8 +161,6 @@
 	function adjustToWindowDimentions(){
 		adjustBodyToWindowDimensions();		// body .. 
 		
-		
-		
 	};
 	
 	</script>
@@ -91,7 +171,7 @@
 
 	<!-- Body Content -->
 
-	<div id="top-cont" class="yellow-bg">
+	<div id="top-cont" class="yellow-bg" style="margin: 5px 0 0 0;">
 		<div id="user-profile-cont" class="float-fix">
 			<div id="" class="user-thumb-cont float-left">
 				<img class="user-thumb" alt="" src="<%= request.getContextPath() %>/themes/images/megamind.jpg">
@@ -107,52 +187,111 @@
 					<li>
 						<label><s:property value="projects.size()"/> Projects </label>
 					</li>
+					<li>
+						<a href="javascript:void(0);" id="edit-profile-btn" class="blue-link"> edit profile </a>
+					</li>
 				</ul>
 			</div>
 			<div class="float-right">
-				<a href="#new-project-popup" class="float-right btn margin-5px fancy-box-link" style="padding: 2px 12px 4px;"> create new project </a>
+				<a href="#new-project-popup" class="float-right btn margin-5px fancy-box-link" 
+					style="padding: 2px 12px 4px;background-color: #FCFCFC;"> create new project </a>
 			</div>
 		</div>
 	</div>
+	
+	<div id="profile-edit-cont" class="float-fix" style="display: none;">
+		<a class="float-right icon close-icon bold cancel-edit-btn" href="javascript:void(0);" style="font-size: 14px;"> close </a>
+		<form action="<%= request.getContextPath() %>/user/update_profile" method="post" id="user-profile-form" >
+			<input type="hidden" value="<s:property value="loggedInUser.pkey"/>" name="user.pkey">
+			<div class="float-left" style="padding-right: 30px; border-right: 1px dashed #CCCCCC; margin-right: 30px;">
+				<ul>
+					<li>
+						<label> Full Name </label>
+						<input type="text" name="user.fullName" value="<s:property value="loggedInUser.fullName"/>" placeholder="Full Name">
+					</li>
+					<li>
+						<label> Location </label>
+						<input type="text" name="user.location" value="<s:property value="loggedInUser.location"/>" placeholder="Country">
+					</li>
+					<li>
+						<input type="button" id="profile-submit-btn" value="update" class="btn btn-yellow float-right margin-5px">
+<!-- 						<input type="button" value="cancel" class="btn float-right margin-5px cancel-edit-btn" style="clear: none;"> -->
+					</li>
+				</ul>
+			</div>
+			<div class="float-left">
+				<div id="edit-passwd-cont">
+					<ul>
+						<li>
+							<label> Change Password <span class="normal gray-ccc-text"> &nbsp; &nbsp; * not necessary </span></label>
+							<input type="password" id="user-pswd" name="newPassword" placeholder="new password" class=" " >
+						</li>
+						<li>
+							<input type="password" id="user-confirm-pswd" value="" placeholder="confirm password" class=" ">
+						</li>
+					</ul>
+				</div>
+			</div>
+		</form>
+	</div>
 		
 	<div id="main-cont">
-		
-		<ul id="user-interactions-list" class="">
 	
-			<s:iterator value="projects" var="project">
-	  		
-		  		<li class="interaction">
-
-					<a title="edit" href="<%= request.getContextPath() %>/project/build/prepare?project.pkey=<s:property value="%{#project.pkey}" />&user.emailId=<s:property value="loggedInUser.emailId"/>" class="thumb">	
-						<s:if test="%{#project.layout.landingPage.screenImage.pkey != null}">
-	 						<img class="" alt="<s:property value="%{#project.layout.landingPage.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#project.layout.landingPage.screenImage.pkey}" />">
-	 					</s:if>
-					</a>
-					
-					<div class="float-left">
-					
-						<div class="float-left">
-							<h2 class="auto-ellipses"><s:property value="%{#project.title}" /></h2>
-							<label class="proj-desc" style="display: none;">
-								<s:property value="%{#project.description}" />
-							</label>
+		<s:if test="%{projects != null && projects.size() > 0}">
+		
+			<ul id="user-interactions-list" class="float-fix" style="margin-top: 15px;">
+	
+				<s:iterator value="projects" var="project">
+			  		<li class="interaction">
+						
+						<input type="hidden" class="project-pkey" value="<s:property value="%{#project.pkey}" />">
+						
+						<div class="img-cont">
+							<a title="edit" href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />" class="thumb">	
+								<s:if test="%{#project.layout.landingPage.screenImage.pkey != null}">
+			 						<img class="" alt="<s:property value="%{#project.layout.landingPage.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#project.layout.landingPage.screenImage.pkey}" />">
+			 					</s:if>
+							</a>
 						</div>
 						
-						<div class="float-left clear margin-5px">
-							<a class="no-border bold margin-5px" href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />"> view </a>
-							<a class="no-border bold margin-5px" href="<%= request.getContextPath() %>/project/build/prepare?project.pkey=<s:property value="%{#project.pkey}" />&user.emailId=<s:property value="loggedInUser.emailId"/>"> edit </a>
-							<a class="no-border bold margin-5px" href="<%= request.getContextPath() %>/project/delete?project.pkey=<s:property value="%{#project.pkey}" />&user.emailId=<s:property value="loggedInUser.emailId"/>"> delete </a>
+						<div class="details-cont">
+							<div class="float-left clear">
+								<h2 class="auto-ellipses"><s:property value="%{#project.title}" /></h2>
+								<p class="proj-desc"><s:property value="%{#project.description}" /></p>
+							</div>
+							<div class="float-left clear" style="margin: 10px 0;">
+								<label class=""> <span class="bold">for </span> <s:property value="%{#project.projectType}" /></label>
+								
+								<label> 
+									<span class="bold">tags </span> 
+									<s:iterator value="%{#project.tags}" var="tag">
+										<s:property value="%{#tag.title}" /> 
+									</s:iterator>
+								</label>
+								
+								<s:if test="%{#project.isPublic == true}">
+									<label class="gray-999-text bold"> * published to public</label>							
+								</s:if>
+								
+							</div>
 						</div>
-					
-					</div>
-		  			
-					<input type="hidden" class="project-pkey" value="<s:property value="%{#project.pkey}" />">
-		  			
-		  		</li>
-	 		
-			</s:iterator>
-		</ul>
-	
+						
+						<div class="options-cont">
+							<a class="view-icon bold margin-5px" href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />"> view </a>
+							<a class="edit-icon bold margin-5px" href="<%= request.getContextPath() %>/project/build/prepare?project.pkey=<s:property value="%{#project.pkey}" />&user.emailId=<s:property value="loggedInUser.emailId"/>"> edit </a>
+							<a class="delete-icon bold margin-5px" href="<%= request.getContextPath() %>/project/delete?project.pkey=<s:property value="%{#project.pkey}" />&user.emailId=<s:property value="loggedInUser.emailId"/>"> delete </a>
+						</div>
+						
+			  		</li>
+				</s:iterator>
+			</ul>
+		</s:if>
+		<s:else>
+			<div id="no-items-cont" style="width: 305px;">
+				<a href="#new-project-popup" class="plus-icon float-left fancy-box-link" > Create new project </a>
+				<label class=""> and start stitching </label>
+			</div>
+		</s:else>
 	
 	</div>   
 		
@@ -165,37 +304,7 @@
 				<label class="title"> Stitch a New Pattern </label>
 				<p> Pattern should represent a complete navigation sequence from a Mobile Project, explained in maximum of 10 slides. </p>
 				
-				<form action="<%= request.getContextPath() %>/project/save" id="new-pattern-form" method="post">
-					
-					<section style="display: none;">
-						<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
-						
-						<textarea class="mandatory" name="project.description" placeholder="Project description">
-							<s:property value="project.description" />
-						</textarea>
-							
-						<select name="project.projectType" class="inp-box inner-shadow" id="project-type-select" onchange="loadProjectRelatedDetails(this);">
-							<option value="AndroidMobile"> Android Mobile </option>
-							<option value="AndroidTab"> Android Tab </option>
-							<option value="Iphone3" selected="selected"> Iphone 3 Mobile </option>
-							<option value="Iphone4"> Iphone 4 Mobile </option>
-							<option value="Ipad"> Ipad </option>
-							<option value="Webapp"> Web Application </option>
-							<option value="Custom"> Custom Application </option>
-						</select>
-							
-						<input placeholder="in pixels" type="text" value="320" name="layout.width" class="" >					 				
-						<input placeholder="in pixels" type="text" value="480" name="layout.height" class="" >
-				
-						<select class="inp-box inner-shadow" name="layout.orientation" id="orientation-select">
-							<option value="none"> -- default --</option>
-							<option value="vertical" selected="selected"> vertical </option>
-							<option value="horizontal"> horizontal </option>
-							<option value="both"> both </option>
-						</select>
-					
-					</section>
-			
+				<form action="<%= request.getContextPath() %>/project/settings" id="new-pattern-form" method="post">
 					<ul>
 						<li>
 							<label> Task being stitched </label>
@@ -206,7 +315,6 @@
 							<input type="text" placeholder="eg. SignUps" class="mandatory" name="project.tags[0].title" value="" id="tags-autocomplete">
 						</li>
 						<li>
-<!-- 							<label> Your email </label> -->
 							<input type="hidden" name="user.emailId" value="<s:property value="loggedInUser.emailId"/>">
 						</li>
 						<li>

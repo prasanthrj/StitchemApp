@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -68,7 +69,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
 
 	// Publishing related .. 
 	private PublishDetails publishDetails;	
-	private List<User> appUsers;
+	private Set<User> appUsers;
 	
 	// LandingPage
 	private Boolean isLandingPage;
@@ -88,7 +89,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
             	
             	// Publishing Related ...
             	publishDetails = project.getPublishDetails();
-        		appUsers = project.getAppUsers();
+//        		appUsers = project.getAppUsers();
             }
         }
         
@@ -101,7 +102,7 @@ public class ScreenBuilderAction extends GenericActionSupport {
         }
         
         String hotSpot_pkey = this.request.getParameter("hotSpot.pkey");
-        if (hotSpot_pkey != null && StringUtils.isNotEmpty(hotSpot_pkey)){
+        if (hotSpot_pkey != null && StringUtils.isNotEmpty(hotSpot_pkey)) {
             hotSpot = screenBuilderService.readHotSpot(Integer.valueOf(hotSpot_pkey));
             if (hotSpot != null) {
 //				uiEvents = hotSpot.getUiEvents();
@@ -752,11 +753,11 @@ public class ScreenBuilderAction extends GenericActionSupport {
 		this.publishDetails = publishDetails;
 	}
 
-	public List<User> getAppUsers() {
+	public Set<User> getAppUsers() {
 		return appUsers;
 	}
 
-	public void setAppUsers(List<User> appUsers) {
+	public void setAppUsers(Set<User> appUsers) {
 		this.appUsers = appUsers;
 	}
 

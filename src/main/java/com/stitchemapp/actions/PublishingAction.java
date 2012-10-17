@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -27,7 +28,6 @@ import com.stitchemapp.entities.ImageFile;
 import com.stitchemapp.entities.Page;
 import com.stitchemapp.entities.Project;
 import com.stitchemapp.entities.PublishDetails;
-import com.stitchemapp.entities.Tag;
 import com.stitchemapp.entities.User;
 import com.stitchemapp.services.ContentService;
 import com.stitchemapp.services.ProjectService;
@@ -49,13 +49,11 @@ public class PublishingAction extends GenericActionSupport {
 	private Boolean isIframe = false;
 	
 	private Page page;
-//	private List<Page> pages;
 	
 	private User appUser;
 	
 	private PublishDetails publishDetails;	
-	private List<User> appUsers;
-	
+	private Set<User> appUsers;
 	
 	// QR Code
 	private ImageFile imageFile;
@@ -100,7 +98,7 @@ public class PublishingAction extends GenericActionSupport {
 	
 	/* Publishing Related */
 	
-	public String fetchProjectPublishDetails() {
+	public String prepareProjectPublishDetails() {
 		
 		if(project != null){
 			publishDetails = project.getPublishDetails();
@@ -112,56 +110,45 @@ public class PublishingAction extends GenericActionSupport {
 	
 	public String manageProjectPublishDetails() {
 		
-		// TODO check this
-		
-		if (project != null) {
-			projectService.updateProject(project);
-		}
+		if (project == null)
+			return INPUT;
 		
 		if (publishDetails != null) {
-			
-			// TODO Check this ..
 			publishDetails.setIsPublished(true);
-			
 			if (publishDetails.getPkey() == null) {
 				publishingService.createPublishDetails(publishDetails);
 			} else {
 				publishingService.updatePublishDetails(publishDetails);
 			}
-			
 		}
 		
+		// AppUsers 
+		List<User> newUsers = new ArrayList<User>();
 		if (appUsers != null) {
-			List<User> users = new ArrayList<User>();
+			Set<User> latestAppUsers = project.getAppUsers();
+
+			User user;
 			for (User appUser : appUsers) {
 				if (appUser != null && appUser.getPkey() == null) {
-					
-					User user = userService.readUserByEmailId(appUser.getEmailId());
-					if(user != null)
-						users.add(user);
-					
+					user = userService.findOrCreateUser(appUser);
+					latestAppUsers.add(user);
+					newUsers.add(user);
 				}
 			}
 			
-			project.setAppUsers(users);
+			project.setAppUsers(latestAppUsers);
 			projectService.updateProject(project);
 		}
 		
-		if(!project.getIsPublic()){
-			String HostUrl = RequestUtils.fetchHostURL(request);
-			publishingService.broadcastProjectPublishingDetailsToUsers(project, HostUrl);
-		} else {
-			Tag tag = project.getTags().get(0);
-			tag.setCount(tag.getCount() + 1);
-			contentService.updateTag(tag);
-		}
-				
+		String HostUrl = RequestUtils.fetchHostURL(request);
+		publishingService.publishProjectDetailsAndUpdateAppUsers(project, HostUrl, newUsers);
+		
 		return SUCCESS;
 	}
 	
 	
 	
-	public String publishProjectForMobile(){
+	public String publishProjectForMobile() {
 		
 		if( (project.getIsPublic() && project.getIsApproved()) 
 				|| (!project.getIsPublic() && appUser != null ) ) {
@@ -181,7 +168,7 @@ public class PublishingAction extends GenericActionSupport {
 	
 	
 	
-	public String publishProjectForWeb(){
+	public String publishProjectForWeb() {
 		
 		if( (project.getIsPublic() && project.getIsApproved()) 
 				|| (!project.getIsPublic() && appUser != null ) ) {
@@ -197,21 +184,23 @@ public class PublishingAction extends GenericActionSupport {
 		}
 		
 		return SUCCESS;
-
 	}
 
 	
 
 	/* Preview related */
 	
-	public String generateProjectPreview(){
+	public String generateProjectPreview() {
+		
+		if (project == null)
+			return INPUT;
 		
 		// project is ready and available ..
 		docToPublish = publishingService.prepareProjectPublishDoc(project);
 				
 		return SUCCESS;
-
 	}
+	
 	
 	
 	/* QR Codes .. */
@@ -220,9 +209,7 @@ public class PublishingAction extends GenericActionSupport {
 		if( project != null ){
 			
 			if(!project.getIsPublic() && appUser != null) {
-				
 				// check for appUser correctness 
-				
 				return INPUT;
 			} 
 
@@ -231,13 +218,10 @@ public class PublishingAction extends GenericActionSupport {
 			publishUrl.append(RequestUtils.fetchHostURL(request));
 			publishUrl.append("/publish/mobile?project.pkey=").append(project.getPkey());
 
-			
 			// Encoding ..
-			
 			Charset charset = Charset.forName(charSetName);
 			CharsetEncoder encoder = charset.newEncoder();
 			byte[] stringInBytes = null;
-			
 			byte[] QRCodeInBytes = null;
 			
 			try {
@@ -343,7 +327,6 @@ public class PublishingAction extends GenericActionSupport {
 	public Boolean getIsIframe() {
 		if(this.isIframe == null)
 			isIframe = false;
-		
 		return isIframe;
 	}
 
@@ -359,19 +342,11 @@ public class PublishingAction extends GenericActionSupport {
 		this.page = page;
 	}
 
-//	public List<Page> getPages() {
-//		return pages;
-//	}
-//
-//	public void setPages(List<Page> pages) {
-//		this.pages = pages;
-//	}
-
-	public User getUser() {
+	public User getAppUser() {
 		return appUser;
 	}
 
-	public void setUser(User appUser) {
+	public void setAppUser(User appUser) {
 		this.appUser = appUser;
 	}
 
@@ -383,11 +358,11 @@ public class PublishingAction extends GenericActionSupport {
 		this.publishDetails = publishDetails;
 	}
 
-	public List<User> getUsers() {
+	public Set<User> getAppUsers() {
 		return appUsers;
 	}
 
-	public void setUsers(List<User> appUsers) {
+	public void setAppUsers(Set<User> appUsers) {
 		this.appUsers = appUsers;
 	}
 

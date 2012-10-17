@@ -37,6 +37,8 @@ public class PublishingManagerTest {
 	@Test
 	public void testProjectPublishing(){
 		
+		LOGGER.info("Test : Project Publishing");
+		
 	}
 	
 	

@@ -1,2 +1,0 @@
-
-http://stackoverflow.com/questions/8067906/reading-html-files-for-use-as-email-templates

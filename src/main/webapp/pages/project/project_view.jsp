@@ -9,7 +9,7 @@
 
 <head>
 
-	<title> Project View </title>
+	<title> View </title>
 	
 	<script type="text/javascript" >
 	
@@ -24,7 +24,15 @@
 		
 		
 		$('#write-comment-btn').live('click', function() {
-			$('#new-comment-cont').slideToggle(600);
+			var btn = $(this);
+			var commentsCont = $('#new-comment-cont');
+			commentsCont.slideToggle(600, function(){
+				if(commentsCont.css('display') == 'block') {
+					btn.html('discard comment');
+				} else {
+					btn.html('let me write a comment');
+				}
+			});
 		});
 		
 		$('#postCommentForm').ajaxForm({
@@ -41,13 +49,13 @@
 					commentHtml += '<p class="bold gray-333-text">' + comment.user.fullName + '</p>';
 					commentHtml += '<label class="gray-666-text">' + comment.body + '</label>';
 					commentHtml += '</div>';
+					commentHtml += '</li>';
 					
 					$('#project-comments-list li:first').after(commentHtml);
-					
 					var commentsCnt = $('#comments-count');
 					var count = parseInt(commentsCnt.text());
 					commentsCnt.html(count + 1);
-					
+
 				}
 			},
 			complete: function(){
@@ -103,28 +111,26 @@
 				<tr>
 					<td>
 						<div id="qr-code-cont">
-							<label class="sub-title"> Scan to view it on device </label>
-							<img id="QRcode-img" alt="QR Code" src="<%= request.getContextPath() %>/publish/mobile_qrcode?project.pkey=<s:property value="project.pkey" />">
+							<img id="QRcode-img" alt="QR Code" title="QR Code : Scan to view it on device" 
+								src="<%= request.getContextPath() %>/publish/mobile_qrcode?project.pkey=<s:property value="project.pkey" />">
 						</div>
 					</td>
 					<td>
 						<ul id="" class="float-left">
 							<li>
 								<div class="float-left">
-									<h1 class="pro-title"> <s:property value="project.title" /> </h1>
-									<p class=""> <s:property value="project.description" /> 
-										Assuming you don't mean some non-standard JDK DatagramPacket, OpenJDK should have what you're looking for. Though I must say I'd be
-									</p>
+									<h1 class="bold"> About : </h1>
+									<p class=""> <s:property value="project.description" /> </p>
 								</div>
 							</li>
 							<li>
-								<div class="float-left" style="border-right: 1px solid #CCCCCC;">
-									<label class="sub-title"> Stitched by : </label>
-									<p class="bold"> <a href="<%= request.getContextPath() %>/user/profile?user.pkey=<s:property value="project.publisher.pkey" />"> <s:property value="project.publisher.fullName" /> </a> </p>
+								<div class="float-left clear">
+									<label class=""> Stitched by &nbsp; </label> 
+									<label class="underline"> <a href="<%= request.getContextPath() %>/user/profile?user.pkey=<s:property value="project.publisher.pkey" />"> <s:property value="project.publisher.fullName" /> </a> </label>
 								</div>
-								<div class="float-left">
-									<label class="sub-title"> Device : </label>
-									<p class="bold"> <s:property value="project.projectType" /> ( <s:property value="project.layout.width" />px <span class="normal"> X </span> <s:property value="project.layout.height" />px ) </p>
+								<div class="float-left clear">
+									<label class=""> for &nbsp; </label>
+									<label class="bold"> <s:property value="project.projectType" /> ( <s:property value="project.layout.width" />px <span class="normal"> X </span> <s:property value="project.layout.height" />px ) </label>
 								</div>
 							</li>
 						</ul>
@@ -153,7 +159,7 @@
 						<a href="javascript:void(0)" id="" class="float-left bold fancy-box-link"> Login to write a comment </a>
 					</auth:authorize>
 					<auth:authorize ifNotGranted="ROLE_ANONYMOUS">
-						<a href="javascript:void(0)" id="write-comment-btn" class="float-left bold"> Write a comment </a>
+						<a href="javascript:void(0)" id="write-comment-btn" class="float-left bold"> let me write a comment </a>
 					</auth:authorize>
 					
 					<label class="gray-666-text float-right"> <span id="comments-count"><s:property value="comments.size()" /></span> Comments </label>

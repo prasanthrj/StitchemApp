@@ -4,9 +4,8 @@ public enum ProjectType {
 
 	AndroidMobile (480, 800, 120, 180), 
 	AndroidTab (1280, 800, 120, 180), 
-	Iphone3 (320, 480, 120, 180), 
-	Iphone4 (640, 960, 120, 180), 
-	Ipad (1024, 768, 120, 180), 
+	IPhone (320, 480, 120, 180), 
+	IPad (1024, 768, 120, 180), 
 	Webapp (1024, 900, 120, 180), 
 	Custom (null, null, null, null);
 

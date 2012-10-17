@@ -140,7 +140,7 @@ function preventEventDefaults(event) {
 
 /* Notifications */
 
-function showNotificationMsg( msgType, msgText ) {
+function showNotificationMsg( msgType, msgText, autoHide ) {
 	switch (msgType) {
 		case 'alert':
 			
@@ -169,9 +169,12 @@ function showNotificationMsg( msgType, msgText ) {
 	notifCont.find('.msg-text').html(msgText);
 	
 	notifCont.show('fade');
-	setTimeout(function() {
-		notifCont.hide('fade');
-	}, 2500);
+	
+	if(autoHide || autoHide == null) {
+		setTimeout(function() {
+			notifCont.hide('fade');
+		}, 2500);
+	}
 	
 };
 

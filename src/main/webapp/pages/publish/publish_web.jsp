@@ -66,7 +66,7 @@
 						commentsHtml += '<div class="float-left">';
 						commentsHtml += '<label class="float-left clear gray-666-text">';
 						
-						var displayName = comment.appUser.name;
+						var displayName = comment.appUser.fullName;
 						if(!displayName)
 							displayName = comment.appUser.emailId;
 						

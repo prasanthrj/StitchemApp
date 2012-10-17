@@ -74,22 +74,15 @@ public class UserAccountAction extends GenericActionSupport {
 	
 	/* Getters and Setters */
 	
-	
-	public UserAccountService getUserAccountService() {
-		return userAccountService;
-	}
-
 	public void setUserAccountService(UserAccountService userAccountService) {
 		this.userAccountService = userAccountService;
-	}
-
-	public ProjectService getProjectService() {
-		return projectService;
 	}
 
 	public void setProjectService(ProjectService projectService) {
 		this.projectService = projectService;
 	}
+	
+	
 	
 	public UserNotifications getNotifications() {
 		return notifications;

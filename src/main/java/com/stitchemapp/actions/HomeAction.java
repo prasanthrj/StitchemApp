@@ -21,7 +21,7 @@ import com.stitchemapp.services.ProjectService;
 public class HomeAction extends GenericActionSupport implements ApplicationContextAware {
 	
 	public static final Logger LOGGER = Logger.getLogger(HomeAction.class);
-	
+
 	private ApplicationContext applicationContext;
 	
 	private SocialUserDetailsService socialUserDetailsService;
@@ -77,10 +77,8 @@ public class HomeAction extends GenericActionSupport implements ApplicationConte
 	
 	
 	public String prepareStaticPage() {
-		
 		// TODO prepare Static Content pages
-		
-		
+
 		return SUCCESS;
 	}
 	
@@ -125,7 +123,12 @@ public class HomeAction extends GenericActionSupport implements ApplicationConte
 	}
 
 
-	
+	public String prepareForgotPassword() {
+		if (!loggedInUser.getUsername().equals(Constants.ANONYMOUS_USER_NAME)) 
+			return NONE;
+		
+		return SUCCESS;
+	}
 	
 	
 	

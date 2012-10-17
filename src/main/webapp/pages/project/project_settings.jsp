@@ -7,7 +7,7 @@
 
 <head>
 
-	<title> Project View </title>
+	<title> Project Configuration </title>
 	
 	<script type="text/javascript" >
 	
@@ -54,40 +54,46 @@
 		
 	};
 	
-	function loadProjectDimensions(select) {
+	function loadDeviceSpecs(select) {
 		var device = $(select).val();
 		
-		var layoutWidth = $('#layout-width');
-		var layoutHeight = $('#layout-height');
+		var layoutWidth = $('.layout-width');
+		var layoutHeight = $('.layout-height');
+		
+		var imgBaseUrl = '<%= request.getContextPath() %>/themes/images/devices/';
+		var imgElem = $('#proj-img-cont img');
+		if(device != 'Custom') {
+			var imgUrl = imgBaseUrl + device + '.png';
+			imgElem.hide().attr('src', imgUrl).show('fade');
+		} else {
+			imgElem.hide();	
+		}
 		
 		switch (device) {
 			case 'AndroidMobile':
-				layoutWidth.attr('value', 480);
-				layoutHeight.attr('value', 800);
+				layoutWidth.text(480);
+				layoutHeight.text(800);
 				break;
 			case 'AndroidTab':
-				layoutWidth.attr('value', 1280);
-				layoutHeight.attr('value', 800);
+				layoutWidth.text(1280);
+				layoutHeight.text(800);
 				break;
-			case 'Iphone3':
-				layoutWidth.attr('value', 320);
-				layoutHeight.attr('value', 480);
+			case 'IPhone':
+				layoutWidth.text(320);
+				layoutHeight.text(480);
 				break;
-			case 'Iphone4':
-				layoutWidth.attr('value', 640);
-				layoutHeight.attr('value', 960);
-				break;
-			case 'Ipad':
-				layoutWidth.attr('value', 1024);
-				layoutHeight.attr('value', 768);
+			case 'IPad':
+				layoutWidth.text(1024);
+				layoutHeight.text(768);
 				break;
 			case 'Webapp':
-				layoutWidth.attr('value', 1024);
-				layoutHeight.attr('value', 900);
+				layoutWidth.text(1024);
+				layoutHeight.text(900);
 				break;
 			case 'Custom':
-				layoutWidth.attr('value', '');
-				layoutHeight.attr('value', '');
+				layoutWidth.text('-- ');
+				layoutHeight.text('-- ');
+				
 				break;
 			default:
 				break;
@@ -115,53 +121,77 @@
 	
 	<div id="main-cont" class="float-fix">
 		
-		<form action="<%= request.getContextPath() %>/project/save" method="post" id="new-post-form">
+		<form action="<%= request.getContextPath() %>/project/save" method="post" id="new-post-form" >
 		
-			<div id="project-settings-cont" class="">
+			<div class="project-settings-cont" style="border-right: 1px dotted #CCCCCC; padding: 0 30px 0 0;">
 			
 		 		<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
-		 		<s:if test="%{#loggedInUser.emailId != null}">
-		 			<input type="hidden" placeholder="will be used for account creation" class="mandatory emailid" name="user.emailId" value="<s:property value="loggedInUser.emailId"/>">
+	 			<s:if test="%{#loggedInUser.emailId != null}">
+		 			<input type="hidden" class="mandatory emailid" name="user.emailId" value="<s:property value="loggedInUser.emailId"/>">
 		 		</s:if>
 		 		<s:else>
-		 			<input type="hidden" placeholder="will be used for account creation" class="mandatory emailid" name="user.emailId" value="<s:property value="user.emailId"/>">
+		 			<input type="hidden" class="mandatory emailid" name="user.emailId" value="<s:property value="user.emailId"/>">
 		 		</s:else>
 		 		
 		 		<ul id="project-settings-list">
 		 			<li>
-		 				<label>title :</label>
-		 				<input type="text" class="mandatory" name="project.title" value="<s:property value="project.title" />" placeholder="Project title">
+		 				<label>Title :</label>
+		 				<input type="text" class="mandatory" name="project.title" value="<s:property value="project.title" />" placeholder="Name your project">
 		 			</li>
 		 			<li>
-		 				<label>description :</label>
-		 				<textarea class="mandatory" name="project.description" placeholder="Project description" style="height: 100px;"><s:property value="project.description" /></textarea>
+		 				<label>Description :</label>
+		 				<textarea class="mandatory" name="project.description" placeholder="No Stories please" style="height: 100px;"><s:property value="project.description" /></textarea>
 		 			</li>
 		 			<li>
-		 				<label> pattern category </label>
+		 				<label>Pattern category </label>
 						<input type="text" placeholder="eg. SignUps" class="mandatory" name="project.tags[0].title" value="<s:property value="project.tags[0].title" />" id="tags-autocomplete">
 					</li>
-		 			<li>
-		 				<label>intended device :</label>
-		 				<select name="project.projectType" class="" id="project-type-select" onchange="loadProjectDimensions(this);">
-		 					<option value="AndroidMobile"> Android Mobile </option>
-		 					<option value="AndroidTab"> Android Tab </option>
-		 					<option value="Iphone3"> Iphone 3 Mobile </option>
-		 					<option value="Iphone4"> Iphone 4 Mobile </option>
-		 					<option value="Ipad"> Ipad </option>
-		 					<option value="Webapp"> Web Application </option>
-		 					<option value="Custom"> Custom Application </option>
-		 				</select>
-		 			</li>
-		 			<li>
-						<label>dimensions :</label>		 				
-	 					<div class="float-left">
-							<input placeholder="in pixels" id="layout-width" type="text" value="<s:property value="layout.width" />" name="layout.width" class="clear float-left" style="width: 138px;">					 				
+					<li>
+						<label class="gray-999-text">Select device on the right..</label>
+					</li>
+		 		</ul>
+
+			</div>
+			
+			<div id="proj-img-cont" class="float-left margin-5px">
+ 				<img alt="" src="<%= request.getContextPath() %>/themes/images/devices/AndroidMobile.png">
+ 			</div>
+			
+			<div class="project-settings-cont" style="">
+			
+				<div class="float-left clear">
+	 				<label class="bold" style="">Device :</label>
+	 				<select name="project.projectType" class="float-left clear" id="project-type-select" onchange="loadDeviceSpecs(this);">
+	 					<option value="IPhone" selected="selected"> IPhone </option>
+						<option value="IPad"> IPad </option>
+						<option value="AndroidMobile"> Android Mobile </option>
+						<option value="AndroidTab"> Android Tab </option>
+						<option value="Webapp"> Web Application </option>
+						<option value="Custom"> Custom Application </option>
+	 				</select>
+	 			</div>
+	 			
+	 			<div id="device-desc-cont" class="float-left clear" style="margin: 30px 0px;">
+	 				<p class="gray-999-text" style="max-width: 280px; margin-bottom: 15px;">
+						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 	 				
+	 				</p>
+	 				<label class="float-left clear normal" style="margin: 0;">Width : <span class="layout-width"> </span>px</label>
+	 				<label class="float-left clear normal" style="margin: 0;">Height : <span class="layout-height"> </span>px</label>
+	 			</div>
+	 			
+	 			<div id="proj-dim-cont" class="float-left clear" style="margin: 30px 0px; display: none;">
+					<label class="bold ">Dimensions <span class="normal">(px)</span> :</label>	
+					
+					<div class="float-left clear">
+						<div class="float-left">
+							<input placeholder="Width" type="text" value="<s:property value="layout.width" />" name="layout.width" class="clear float-left" style="width: 128px;">					 				
 	 					</div>
 	 					<div class="float-left" style="margin-left: 8px;">
-							<input placeholder="in pixels" id="layout-height"  type="text" value="<s:property value="layout.height" />" name="layout.height" class="clear float-left" style="width: 138px;">					 				
+							<input placeholder="Height" type="text" value="<s:property value="layout.height" />" name="layout.height" class="clear float-left" style="width: 128px;">					 				
 	 					</div>
-		 			</li>
-		 			
+					</div>	 				
+ 					
+ 					<%-- 
 		 			<li>
 		 				<label>oreintation :</label>
 	 					<select class="" name="layout.orientation" id="orientation-select">
@@ -171,29 +201,20 @@
 	 						<option value="both"> both </option>
 	 					</select>
 		 			</li>
-		 			
-		 		</ul>
-
-			</div>
-			
-			<div id="" class="float-left">
+		 			 --%>
+		 			 
+		 		</div>
+		 		
+		 		<div class="float-left clear " style="margin: 30px 0px;">
+					<input type="submit" value="continue" class="btn btn-yellow">
+				</div>
 				
-			</div>
-			
-			<div class="float-fix" style="width: 160px; margin: 40px auto 0;">
-				<input type="submit" value="save" class="btn btn-yellow">
 			</div>
 			
 		</form>
 		
 	</div>
 
-	<section class="pop-ups-cont">
-
-
-	</section>
-	
-	
 </body>
 
 </html>		

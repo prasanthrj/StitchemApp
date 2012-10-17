@@ -43,7 +43,7 @@
 		        <entry key="hibernate.c3p0.min_size" value="5"/>
 		        <entry key="hibernate.c3p0.max_size" value="20"/>
 		        <entry key="hibernate.c3p0.timeout" value="1800"/>
-		        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect"/>
+		        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
       		</map>
     	</property>
         <property name="jpaDialect">
@@ -91,7 +91,7 @@
 	
 	<bean id="userAction" class="com.stitchemapp.actions.UserAction" scope="prototype">
 		<property name="userService" ref="userService" />
-	
+		
 		<property name="socialUserDetailsService" ref="socialUserDetailsService" />
 	</bean>
 	
@@ -196,8 +196,8 @@
 	</bean>
 	
 	<bean id="mailingService" class="com.stitchemapp.mail.MailingServiceImpl">
-		<property name="genericDao" ref="genericDao" />
 		<property name="mailSender" ref="mailSender" />
+		<property name="tmplDirPath" value="${email.template.dir}" />
 	</bean>
 	
 	<!-- Mailer related Beans Ends -->

@@ -73,75 +73,60 @@
 	
 	<div id="main-cont"> 
 		
-		<ul id="user-interactions-list" class="">
+		<s:if test="%{projects != null && projects.size() > 0}">
+		
+			<ul id="user-interactions-list" class="float-fix" style="margin-top: 15px;">
 	
-			<s:iterator value="projects" var="project">
-	  		
-		  		<li class="interaction">
-
-					<a href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />&user.emailId=<s:property value="loggedInUser.emailId"/>" class="thumb">	
-						<s:if test="%{#project.layout.landingPage.screenImage.pkey != null}">
-	 						<img class="" alt="<s:property value="%{#project.layout.landingPage.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#project.layout.landingPage.screenImage.pkey}" />">
-	 					</s:if>
-					</a>
-					
-					<div class="float-left">
-					
-						<div class="float-left">
-							<h2 class="auto-ellipses"><s:property value="%{#project.title}" /></h2>
-							<label class="proj-desc" style="display: none;">
-								<s:property value="%{#project.description}" />
-							</label>
+				<s:iterator value="projects" var="project">
+			  		<li class="interaction">
+						
+						<input type="hidden" class="project-pkey" value="<s:property value="%{#project.pkey}" />">
+						
+						<div class="img-cont">
+							<a title="edit" href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />" class="thumb">	
+								<s:if test="%{#project.layout.landingPage.screenImage.pkey != null}">
+			 						<img class="" alt="<s:property value="%{#project.layout.landingPage.screenImage.fileObjFileName}" />" src="<%= request.getContextPath() %>/image/view?project.pkey=<s:property value="project.pkey" />&imageFile.pkey=<s:property value="%{#project.layout.landingPage.screenImage.pkey}" />">
+			 					</s:if>
+							</a>
 						</div>
 						
-						<div class="float-left clear margin-5px">
-							<a class="no-border bold margin-5px" href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />"> view </a>
+						<div class="details-cont">
+							<div class="float-left clear">
+								<h2 class="auto-ellipses"><s:property value="%{#project.title}" /></h2>
+								<p class="proj-desc"><s:property value="%{#project.description}" /></p>
+							</div>
+							<div class="float-left clear" style="margin: 10px 0;">
+								<label class=""> <span class="bold">for </span> <s:property value="%{#project.projectType}" /></label>
+								
+								<label> 
+									<span class="bold">tags </span> 
+									<s:iterator value="%{#project.tags}" var="tag">
+										<s:property value="%{#tag.title}" /> 
+									</s:iterator>
+								</label>
+							</div>
 						</div>
 						
-					</div>
-		  			
-					<input type="hidden" class="project-pkey" value="<s:property value="%{#project.pkey}" />">
-		  			
-		  		</li>
-	 		
-			</s:iterator>
-		</ul>
+						<div class="options-cont">
+							<a class="view-icon bold margin-5px" href="<%= request.getContextPath() %>/project/view?project.pkey=<s:property value="%{#project.pkey}" />"> view </a>
+						</div>
+						
+			  		</li>
+				</s:iterator>
+			</ul>
+		</s:if>
+		<s:else>
+			<div id="no-items-cont" style="width: 305px;">
+				<label class="float-left" > Yet to contribute !!!  </label>
+			</div>
+		</s:else>
+		
+		
 	
 	
 	</div>   
 		
 	<section class="pop-ups-cont">
-	
-		
-		<!-- Project Delete pop-up -->
-		
-		<div id="project-delete-popup" class="pop-up">
-			<form id="projectDeleteForm" action="<%= request.getContextPath() %>/project/delete" method="post">
-						
-				<input type="hidden" name="project.pkey" value="" id="project-pkey">
-				
-				<div class="pu-header">
-					<label class="pu-title float-left"> Confirmation </label>
-					<a href="javascript:void(0);" class="close-icon float-right close-pop-up"></a>
-				</div>
-				<div class="pu-body">
-					<div class="msg-cont">
-					
-					</div>
-					<div class="pu-content">
-						<label>Are you sure?</label>
-					</div>
-				</div>
-				
-				<div class="pu-footer">
-					<div class="btn-cont">
-						<input type="button" value="Cancel" id="" class="close-pop-up btn">
-						<input type="submit" value="Delete Project" id="" class="btn">
-					</div>
-				</div>
-				
-			</form>
-		</div>
 	
 	</section>
 	

@@ -30,6 +30,6 @@
 	<!-- Configures Shared application beans -->
 	
 	<import resource="applicationContext-beans.xml" />
-	
+
 
 </beans>

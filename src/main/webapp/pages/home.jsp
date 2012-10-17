@@ -180,15 +180,15 @@
 	
 		<div id="carousel-cont" class="yellow-bg float-fix">
 			
-			<div class="float-fix" style="margin: 20px auto; width: 960px; padding: 15px 0;">
+			<div class="float-fix" style="margin: 20px auto 0; width: 960px; padding: 15px 0;">
 				<label class="normal" style="width: 600px; padding: 15px; font-size: 28px; line-height: 32px;">Create and share mobile mockups like never before.</label>
 				
 				<auth:authorize ifAnyGranted="ROLE_ANONYMOUS">
-					<a href="<%= request.getContextPath() %>/signup" class="float-right btn margin-5px"> signup now </a>
+					<a href="<%= request.getContextPath() %>/signup" class="float-right btn margin-5px" style="background-color: #FCFCFC;"> signup now </a>
 				</auth:authorize>
 			</div>
 			
-			<ul id="home-carousel" class="inline-list">
+			<ul id="home-carousel" class="inline-list" style="margin: 0 auto 40px;">
 				<li>
 					<img alt="" src="<%= request.getContextPath() %>/themes/images/step-1.png" class="">
 					<label class="clear">Upload your mockups</label>
@@ -272,36 +272,6 @@
 					<p> Pattern should represent a complete navigation sequence from a Mobile Project, explained in maximum of 10 slides. </p>
 					
 					<form action="<%= request.getContextPath() %>/project/settings" id="new-pattern-form" method="post">
-						
-						<section style="display: none;">
-							<input type="hidden" name="project.pkey" value="<s:property value="project.pkey" />">
-							
-							<textarea class="mandatory" name="project.description" placeholder="Project description">
-								<s:property value="project.description" />
-							</textarea>
-								
-							<select name="project.projectType" class="inp-box inner-shadow" id="project-type-select" onchange="loadProjectRelatedDetails(this);">
-								<option value="AndroidMobile"> Android Mobile </option>
-								<option value="AndroidTab"> Android Tab </option>
-								<option value="Iphone3" selected="selected"> Iphone 3 Mobile </option>
-								<option value="Iphone4"> Iphone 4 Mobile </option>
-								<option value="Ipad"> Ipad </option>
-								<option value="Webapp"> Web Application </option>
-								<option value="Custom"> Custom Application </option>
-							</select>
-								
-							<input placeholder="in pixels" type="text" value="320" name="layout.width" class="" >					 				
-							<input placeholder="in pixels" type="text" value="480" name="layout.height" class="" >
-					
-							<select class="inp-box inner-shadow" name="layout.orientation" id="orientation-select">
-								<option value="none"> -- default --</option>
-								<option value="vertical" selected="selected"> vertical </option>
-								<option value="horizontal"> horizontal </option>
-								<option value="both"> both </option>
-							</select>
-						
-						</section>
-				
 						<ul>
 							<li>
 								<label> Task being stitched </label>

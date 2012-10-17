@@ -1,5 +1,5 @@
 package com.stitchemapp.enums;
 
 public enum OrientationType {
-	vertical, horizontal, both, none
+	vertical, horizontal, both
 }

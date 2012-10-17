@@ -27,7 +27,6 @@ public class FaceBookAuthenticationProvider implements SocialAuthenticationProvi
 	private static final String FB_GRAPH_URL = "https://graph.facebook.com";
 	
 	
-	
 	/* Authentication Related */
 	
 	public void authenticateAtProviderForAccessToken(HttpServletRequest request, HttpServletResponse respose) {
@@ -37,7 +36,6 @@ public class FaceBookAuthenticationProvider implements SocialAuthenticationProvi
 		String requestCode = request.getParameter(Constants.REQ_CODE_PARAMETER);
         	
     	try{
-    	
             if (request.getParameter("error_reason") != null) {
                 LOGGER.error("Error: " + request.getParameter("error_description"));
                 
@@ -59,12 +57,9 @@ public class FaceBookAuthenticationProvider implements SocialAuthenticationProvi
                         request.getSession().setAttribute(Constants.AUTH_PROVIDER_PARAMETER, SocialAuthProvider.FaceBook);
 
                     }
-                
                 }
-                
             }
-        
-        } catch (Exception e) {
+    	} catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
             
@@ -102,63 +97,37 @@ public class FaceBookAuthenticationProvider implements SocialAuthenticationProvi
 	
 	
 	
-	
-	
-	
 	/* SocialConnection Manager */
 
 	public SocialConnectionService getSocialConnectionService() {
 		return socialConnectionService;
 	}
 
-	public void setSocialConnectionService(
-			SocialConnectionService socialConnectionService) {
+	public void setSocialConnectionService(	SocialConnectionService socialConnectionService) {
 		this.socialConnectionService = socialConnectionService;
 	}
 
 	
 	/* Some Other Getters and Setters for Fields */
 	
-	public String getConsumerKey() {
-		return consumerKey;
-	}
-
 	public void setConsumerKey(String consumerKey) {
 		this.consumerKey = consumerKey;
-	}
-
-	public String getConsumerSecret() {
-		return consumerSecret;
 	}
 
 	public void setConsumerSecret(String consumerSecret) {
 		this.consumerSecret = consumerSecret;
 	}
 
-	public String getAuthProviderUrl() {
-		return authProviderUrl;
-	}
-
 	public void setAuthProviderUrl(String authProviderUrl) {
 		this.authProviderUrl = authProviderUrl;
-	}
-
-	public String getScope() {
-		return scope;
 	}
 
 	public void setScope(String scope) {
 		this.scope = scope;
 	}
 
-	public String getCallBackUri() {
-		return callBackUri;
-	}
-
 	public void setCallBackUri(String callBackUri) {
 		this.callBackUri = callBackUri;
 	}
-	
-	
 
 }

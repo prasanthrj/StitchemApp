@@ -14,6 +14,7 @@ import com.stitchemapp.entities.Project;
 import com.stitchemapp.entities.PublishDetails;
 import com.stitchemapp.entities.Tag;
 import com.stitchemapp.entities.User;
+import com.stitchemapp.enums.ProjectType;
 import com.stitchemapp.services.ContentService;
 import com.stitchemapp.services.ProjectService;
 import com.stitchemapp.services.PublishingService;
@@ -57,9 +58,10 @@ public class ProjectAction extends GenericActionSupport {
 		String projPkey = this.request.getParameter("project.pkey");
         if (projPkey != null && StringUtils.isNotEmpty(projPkey)){
             project = projectService.readProject(Integer.valueOf(projPkey));
-            if(project != null){
+            if(project != null) {
             	layout = project.getLayout();
-            	pages = layout.getPages();
+            	if(layout != null)
+            		pages = layout.getPages();
             }
         }
         
@@ -123,12 +125,7 @@ public class ProjectAction extends GenericActionSupport {
 //			return ERROR;
 		
 		if (project != null) {
-			this.saveProject();
-			// prepare will read the project
-//			project = projectManager.readProject(project.getPkey());
-			
 			layout = project.getLayout();
-			pages = layout.getPages();
 		} 
 
 		return SUCCESS;
@@ -138,6 +135,9 @@ public class ProjectAction extends GenericActionSupport {
 	public String saveProject(){
 		
 		if (project != null) {
+			
+			if(project.getProjectType() == null)
+				project.setProjectType(ProjectType.IPhone);
 			
 			Tag tag = contentService.readTag(project.getTags().get(0).getTitle());
 			if (tag == null) 
@@ -167,12 +167,14 @@ public class ProjectAction extends GenericActionSupport {
 	
 	}
 	
+	/*
 	public String prepareProjectPublishDetails() {
 		if (project != null) {
 			publishDetails = project.getPublishDetails();
 		}
 		return SUCCESS;
 	}
+	*/
 	
 	
 	public String deleteProject() {
@@ -198,7 +200,7 @@ public class ProjectAction extends GenericActionSupport {
 			if (user != null ) {
 				comment.setProject(project);
 				comment.setUser(user);
-				
+
 				if (comment.getPkey() != null) {
 					projectService.updateComment(comment);
 				} else {
