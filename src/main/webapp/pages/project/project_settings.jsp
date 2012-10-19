@@ -45,6 +45,11 @@
 		var projectType = '${project.projectType}';
 		$('#project-type-select').val(projectType).trigger('change');
 		
+		var layoutOrientation = '${project.layout.orientation}';
+		
+		var orientationSelect = $('#orientation-select-cont select');
+		orientationSelect.val(layoutOrientation);
+		
 	});
 	
 	/* Window resize */
@@ -59,6 +64,14 @@
 		
 		var layoutWidth = $('.layout-width');
 		var layoutHeight = $('.layout-height');
+		
+		var orientationCont = $('#orientation-select-cont');
+		if(device == 'IPad' || device == 'AndroidTab') {
+			orientationCont.slideDown('slow');
+		} else {
+			orientationCont.slideUp('slow');
+		}
+			
 		
 		var imgBaseUrl = '<%= request.getContextPath() %>/themes/images/devices/';
 		var imgElem = $('#proj-img-cont img');
@@ -167,8 +180,17 @@
 						<option value="AndroidMobile"> Android Mobile </option>
 						<option value="AndroidTab"> Android Tab </option>
 						<option value="Webapp"> Web Application </option>
-						<option value="Custom"> Custom Application </option>
+<!-- 						<option value="Custom"> Custom Application </option> -->
 	 				</select>
+	 				
+	 				<div class="float-left clear" id="orientation-select-cont" style="margin: 5px 0;">
+		 				<label class="bold"> Oreintation :</label>
+	 					<select name="project.layout.orientation" style="width: 215px; margin: 0 0 0 8px;">
+	 						<option value="vertical"> vertical </option>
+	 						<option value="horizontal"> horizontal </option>
+	 					</select>
+	 				</div>
+	 				
 	 			</div>
 	 			
 	 			<div id="device-desc-cont" class="float-left clear" style="margin: 30px 0px;">
@@ -190,18 +212,6 @@
 							<input placeholder="Height" type="text" value="<s:property value="layout.height" />" name="layout.height" class="clear float-left" style="width: 128px;">					 				
 	 					</div>
 					</div>	 				
- 					
- 					<%-- 
-		 			<li>
-		 				<label>oreintation :</label>
-	 					<select class="" name="layout.orientation" id="orientation-select">
-	 						<option value="none"> -- default --</option>
-	 						<option value="vertical"> vertical </option>
-	 						<option value="horizontal"> horizontal </option>
-	 						<option value="both"> both </option>
-	 					</select>
-		 			</li>
-		 			 --%>
 		 			 
 		 		</div>
 		 		

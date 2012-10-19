@@ -193,8 +193,14 @@
 				</ul>
 			</div>
 			<div class="float-right">
+				<!-- 
 				<a href="#new-project-popup" class="float-right btn margin-5px fancy-box-link" 
 					style="padding: 2px 12px 4px;background-color: #FCFCFC;"> create new project </a>
+				 -->
+				
+				<a href="<%= request.getContextPath() %>/project/settings" class="float-right btn margin-5px" 
+					style="padding: 2px 12px 4px;background-color: #FCFCFC;"> create new project </a>
+								
 			</div>
 		</div>
 	</div>

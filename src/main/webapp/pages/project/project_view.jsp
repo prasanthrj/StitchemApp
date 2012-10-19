@@ -96,9 +96,9 @@
 		</div>
 	</div>
 	
-	<div id="main-cont" class="float-fix">
+	<div id="main-cont" class="float-fix <s:property value="project.projectType"/> <s:property value="layout.orientation"/>">
 	
-		<div id="preview-cont" class="border-frame">
+		<div id="preview-cont" class="border-frame float-left <s:property value="project.projectType"/> <s:property value="layout.orientation"/>">
 			<iframe src="<%= request.getContextPath() %>/publish/mobile?project.pkey=<s:property value="project.pkey" />" id="preview-iframe"> 
 				<p> Oooops ... , your browser currently doesn't support IFrames .. !!!</p>
 				<p> Supported browsers: <a href="http://www.opera.com">Opera</a>, <a href="http://www.mozilla.com">Firefox</a>, <a href="http://www.apple.com/safari">Safari</a>, and <a href="http://www.konqueror.org">Konqueror</a>. </p>

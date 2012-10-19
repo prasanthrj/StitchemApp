@@ -13,6 +13,7 @@ import com.stitchemapp.entities.Layout;
 import com.stitchemapp.entities.Project;
 import com.stitchemapp.entities.PublishDetails;
 import com.stitchemapp.entities.User;
+import com.stitchemapp.enums.OrientationType;
 import com.stitchemapp.enums.ProjectType;
 import com.stitchemapp.services.ProjectService;
 import com.stitchemapp.services.ScreenBuilderService;
@@ -40,8 +41,9 @@ public class ProjectServiceImpl implements ProjectService {
 				if(layout == null)
 					layout = new Layout();
 				
-				layout.setHeight(project.getProjectType().height());
-				layout.setWidth(project.getProjectType().width());
+				OrientationType orientation = layout.getOrientation();
+				layout.setHeight(project.getProjectType().layoutHeight(orientation));
+				layout.setWidth(project.getProjectType().layoutWidth(orientation));
 				
 				project.setLayout(layout);
 				
@@ -81,14 +83,14 @@ public class ProjectServiceImpl implements ProjectService {
 						|| project.getProjectType().width() != project.getLayout().getWidth() ) {
 					
 					Layout layout = project.getLayout();
-					
-					layout.setHeight(project.getProjectType().height());
-					layout.setWidth(project.getProjectType().width());
+
+					OrientationType orientation = layout.getOrientation();
+					layout.setHeight(project.getProjectType().layoutHeight(orientation));
+					layout.setWidth(project.getProjectType().layoutWidth(orientation));
 					
 					project.setLayout(layout);
 					
 				}
-			
 			}
 			
 			genericDao.update(project);

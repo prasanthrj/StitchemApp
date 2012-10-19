@@ -1,0 +1,77 @@
+
+
+
+/* Carousel */
+
+#pages-list {
+
+}
+
+#pages-list li {
+	margin: 8px 10px;
+	background: url("images/icon_loading.gif") no-repeat scroll center center transparent;
+    cursor: pointer;
+    text-align: center;
+    
+    border: 1px solid #BBBBBB;
+    
+    -webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+	
+	font-size: 12px;
+}
+
+#pages-list li label {
+
+}
+
+#pages-list li div.page-thumb-image-cont {
+	position: relative;
+	padding: 8px;
+}
+
+#pages-list li div.page-thumb-image-cont .img-cont {
+	height: 174px;
+/*     width: 116px; */
+    overflow: hidden;
+    border: 1px solid #666666;
+}
+
+#pages-list li.selected, #pages-list li:HOVER {
+	background: url("images/bg_carousel_selected.png") no-repeat scroll center 196px transparent;
+	border: 1px solid #000000;
+}
+
+#pages-list li.selected div.page-thumb-image-cont, 
+#pages-list li:HOVER div.page-thumb-image-cont {
+	border-color: #330000;
+	background-color: #EDEDED;
+}
+
+#pages-list li.curr-landing-page .page-tt-content {
+	display: block !important;
+}
+
+#pages-list img {
+	display: block;
+	width: 116px;
+
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+}
+
+.IPad.vertical #pages-list img {
+	width: 226px;
+}
+
+.IPad.horizontal #pages-list img {
+	width: 226px;
+}
+
+
+
+
+
+

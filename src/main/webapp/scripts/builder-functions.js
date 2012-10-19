@@ -8,7 +8,7 @@ function pagesListCarouselInitCallback(carousel){
 };
 
 function addPageElementToPageslListCarousel(element){
-	if(!pagesListCarousel){
+	if(!pagesListCarousel) {
 		var carouselPagesList = $('#pages-list');
 		carouselPagesList.html(element);
 		carouselPagesList.jcarousel({

@@ -14,7 +14,6 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.stitchemapp.constants.Constants;
 import com.stitchemapp.entities.ImageFile;
@@ -28,19 +27,18 @@ public class ImageUtils {
 	public static byte[] createThumbnailOutOfImage(BufferedImage sourceImage, ProjectType projectType) {
 		// For now we are scaling based on the image width
 
+//		int thumbNailWidth = projectType.maxThumbNailWidth();
+//		int thumbNailHeight = projectType.maxThumbNailHeight();
+		
+		int thumbNailWidth = 120;
+		int thumbNailHeight = 180;
+		
 		try {
 
-			// Thumb nail
-
-			int thumbNailWidth = projectType.maxThumbNailWidth();
-			int thumbNailHeight = projectType.maxThumbNailHeight();
-
-			int imgType = sourceImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB
-					: sourceImage.getType();
+			int imgType = sourceImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : sourceImage.getType();
 
 			// BufferedImage bufferedThumbnail =
-			// Thumbnails.of(sourceImage).size(thumbNailWidth,
-			// thumbNailHeight).asBufferedImage();
+			// Thumbnails.of(sourceImage).size(thumbNailWidth, thumbNailHeight).asBufferedImage();
 
 			Image thumbnail = sourceImage.getScaledInstance(thumbNailWidth, -1,
 					Image.SCALE_SMOOTH);
@@ -125,13 +123,9 @@ public class ImageUtils {
 					sb.append(line).append("\n");
 				}
 
-				IOException ex = new IOException(
-						"ImageMagick exited with exit code: " + exit);
-				LOGGER.info(
-						"This cmd ["
-								+ Arrays.asList(commands)
-								+ "] to create thumbnail "
-								+ "failed. Check if the imagmagick version installed. Error is ["
+				IOException ex = new IOException("ImageMagick exited with exit code: " + exit);
+				LOGGER.info("This cmd [" + Arrays.asList(commands)
+								+ "] to create thumbnail failed. Check if the imagmagick version installed. Error is ["
 								+ sb.toString() + "]", ex);
 				throw ex;
 			}

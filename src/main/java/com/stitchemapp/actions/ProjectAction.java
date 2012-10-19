@@ -78,14 +78,14 @@ public class ProjectAction extends GenericActionSupport {
 	}
 	
 	
+	/*
 	public String prepareProjectInfo(){
 		
 		// prepare will read the project
 		
 		projectBean = new ProjectPreviewBean();
-		
+
 		projectBean.setPkey(project.getPkey());
-		
 		projectBean.setPublisher(project.getPublisher());
 		
 		projectBean.setTitle(project.getTitle());
@@ -98,18 +98,16 @@ public class ProjectAction extends GenericActionSupport {
 		projectBean.setPagesCount(pages.size());
 		
 		projectBean.setComments(new ArrayList<Comment>());
-		
 
 		return SUCCESS;
 	}
+	*/
 	
 	
 	public String prepareProjectView() {
 
 		// project, pages, layout are prepared ..
 		if(project != null){
-			
-			// publisher Info
 			user = project.getPublisher();
 			comments = projectService.fetchCommentsByProject(project);
 		}
@@ -132,8 +130,7 @@ public class ProjectAction extends GenericActionSupport {
 
 	}
 
-	public String saveProject(){
-		
+	public String saveProject() {
 		if (project != null) {
 			
 			if(project.getProjectType() == null)
@@ -160,11 +157,9 @@ public class ProjectAction extends GenericActionSupport {
 				
 				projectService.createProject(project);
 			}
-			
 		}
 		
 		return SUCCESS;
-	
 	}
 	
 	/*
@@ -175,7 +170,6 @@ public class ProjectAction extends GenericActionSupport {
 		return SUCCESS;
 	}
 	*/
-	
 	
 	public String deleteProject() {
 		if (project != null && project.getPkey() != null) {
@@ -215,9 +209,8 @@ public class ProjectAction extends GenericActionSupport {
 	}
 	
 	public String deleteComment() {
-		if (comment != null && comment.getPkey() != null) {
+		if (comment != null && comment.getPkey() != null)
 			projectService.deleteComment(comment);
-		}
 		
 		return SUCCESS;
 	}
@@ -228,38 +221,23 @@ public class ProjectAction extends GenericActionSupport {
 	
 	/* Getters and Setters */
 	
-	public ProjectService getProjectService() {
-		return projectService;
-	}
-
 	public void setProjectService(ProjectService projectService) {
 		this.projectService = projectService;
-	}
-
-	public ContentService getContentService() {
-		return contentService;
 	}
 
 	public void setContentService(ContentService contentService) {
 		this.contentService = contentService;
 	}
 
-	public ScreenBuilderService getScreenBuilderService() {
-		return screenBuilderService;
-	}
-
-	public void setScreenBuilderService(
-			ScreenBuilderService screenBuilderService) {
+	public void setScreenBuilderService(ScreenBuilderService screenBuilderService) {
 		this.screenBuilderService = screenBuilderService;
-	}
-
-	public PublishingService getPublishingService() {
-		return publishingService;
 	}
 
 	public void setPublishingService(PublishingService publishingService) {
 		this.publishingService = publishingService;
 	}
+	
+	
 	
 	public Project getProject() {
 		return project;

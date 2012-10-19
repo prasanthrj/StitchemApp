@@ -10,6 +10,8 @@
 
 	<title> Admin Home </title>
 	
+	<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/themes/admin.css" media="screen"/>
+	
 	<script type="text/javascript" >
 	
 	$(document).ready( function() {

@@ -5,12 +5,12 @@
 
 <!DOCTYPE HTML>
 <html>
-
 <head>
-	
 	<meta>
+	
 	<title> Project Builder  </title>
-
+	<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/themes/build.css" media="screen"/>
+	
 	<script type="text/javascript">
 	
 	var contextPath = '<%= request.getContextPath() %>';
@@ -21,6 +21,7 @@
 	var projectPkey = parseInt('<s:property value="project.pkey" />');
 	var projectWidth = parseInt('<s:property value="project.layout.width" />');
 	var projectHeight = parseInt('<s:property value="project.layout.height" />');
+	var projectOrientation = '<s:property value="project.layout.orientation" />';
 	
 	var projectType = '<s:property value="project.projectType" />';
 	
@@ -70,14 +71,6 @@
 			'overflow' : 'hidden'
 		});
 		
-		
-		/* Setting initial Visible Items ... */
-		var mainCont = $('#main-cont');
-		if(currNoOfPages == 0) {
-			toggleBuildOptionsVisibility(false);
-		}
-		
-		
 		/* Window resize related ... */
 		var buildCont = $('#build-cont'); 
 		buildCont.css({
@@ -89,6 +82,13 @@
 		$(window).resize(function() {
 			adjustToWindowDimentions();
 		});
+		
+		
+		/* Setting initial Visible Items ... */
+		var mainCont = $('#main-cont');
+		if(currNoOfPages == 0) {
+			toggleBuildOptionsVisibility(false);
+		}
 		
 		
 		/* Carousel ... */
@@ -721,21 +721,15 @@
 	<!-- Body Content -->
 	
 	<section id="info-cont" style="display: none;">
-	
 		<input type="hidden" value="<s:property value="project.pkey" />" id="proj-pkey">
-	
 		<input type="hidden" value="<s:property value="project.layout.height" />" id="proj-height">
 		<input type="hidden" value="<s:property value="project.layout.width" />" id="proj-width">
-		
 		<input type="hidden" value="<s:property value="layout.landingPage.pkey" />" id="landing-page-pkey">
 		
 		<input type="hidden" value="" id="curr-page-pkey" class="curr-page-pkey">
 		<input type="hidden" value="" id="curr-page-title" class="curr-page-title">
-		
 		<input type="hidden" value="" id="curr-page-img-pkey" class="curr-page-img-pkey">
-		
 		<input type="hidden" value="" id="curr-hotspot-pkey" class="curr-hotspot-pkey">
-
 	</section>
 	
 	
@@ -747,7 +741,7 @@
 		</div>
 		<div id="top-nav-cont">
 			<ul id="top-btn-list" class="inline-list">
-				<li>
+				<li >
 					<a href="<%= request.getContextPath() %>/project/settings?project.pkey=<s:property value="project.pkey" />&user.emailId=<s:property value="user.emailId"/>" class="btn">
 						<img alt="" src="<%= request.getContextPath() %>/themes/images/icon_settings.png">
 					</a>
@@ -757,14 +751,13 @@
 	              		onclick="showPreviewInModal(<s:property value="project.pkey"/>);" > preview </a>
 				</li>
 				<li>
-<!-- 	              	<a href="#project-publish-popup" class="btn btn-yellow fancy-box-link" id="publish-btn"> publish </a> -->
 					<a href="<%= request.getContextPath() %>/project/publish_opts?project.pkey=<s:property value="project.pkey" />&user.emailId=<s:property value="user.emailId"/>" class="btn btn-yellow" id="publish-btn"> publish </a>
 				</li>
 			</ul>
 		</div>
 	</div>
 	
-	<div id="top-cont" class="" style="border: none;">
+	<div id="top-cont" class="<s:property value="project.projectType"/> <s:property value="layout.orientation"/>" style="border: none;">
 		
 		<div id="carousel-cont" class="yellow-bg">
 			
@@ -860,7 +853,7 @@
 	
 	</div>
 	
-	<div id="main-cont" style="display: none;">
+	<div id="main-cont" class="<s:property value="project.projectType"/> <s:property value="layout.orientation"/>" style="display: none;">
 	
 		<section id="build-left-cont" >
 			

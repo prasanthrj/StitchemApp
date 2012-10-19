@@ -12,8 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.io.filefilter.FalseFileFilter;
-
 import com.stitchemapp.enums.OrientationType;
 
 @Entity
@@ -53,6 +51,9 @@ public class Layout extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name="orientaion")
 	public OrientationType getOrientation() {
+		if(orientation == null)
+			orientation = OrientationType.vertical;
+		
 		return orientation;
 	}
 

@@ -2,27 +2,49 @@ package com.stitchemapp.enums;
 
 public enum ProjectType {
 
-	AndroidMobile (480, 800, 120, 180), 
-	AndroidTab (1280, 800, 120, 180), 
-	IPhone (320, 480, 120, 180), 
-	IPad (1024, 768, 120, 180), 
-	Webapp (1024, 900, 120, 180), 
-	Custom (null, null, null, null);
+	IPhone (320, 480, 320, 480, null, null), 
+	IPad (1024, 768, 420, 560, 720, 540), 
+	AndroidMobile (480, 800, 300, 500, null, null), 
+	AndroidTab (1280, 800, 350, 560, 720, 450), 
+	Webapp (1024, 900, 720, 540, null, null),
+	Custom (null, null, null, null, null, null);
 
 	private final Integer width;
 	private final Integer height;
-	private final Integer maxThumbnailWidth;
-	private final Integer maxThumbnailHeight;
 	
-	private Integer canvasWidth = 0;
-	private Integer canvasHeight = 0;
+	
+	/**
+	 *  Project specific dimensions ..
+	 *  
+	 *  Here horizontal orientation is available for IPad and Tab only 
+	 *  
+	 */
+	private final Integer vertLayoutWidth;
+	private final Integer vertLayoutHeight;
+	
+	private final Integer horiLayoutWidth;
+	private final Integer horiLayoutHeight;
+	
+
 
 	// Constructor
-	private ProjectType(Integer width, Integer height, Integer maxThumbnailWidth, Integer maxThumbnailHeight) {
+	private ProjectType(Integer width, Integer height, 
+			Integer vertLayoutWidth, Integer vertLayoutHeight,
+			Integer horiLayoutWidth, Integer horiLayoutHeight ) {
 		this.width = width;
 		this.height = height;
-		this.maxThumbnailWidth = maxThumbnailWidth;
-		this.maxThumbnailHeight = maxThumbnailHeight;
+		this.vertLayoutWidth = vertLayoutWidth;
+		this.vertLayoutHeight = vertLayoutHeight;
+		
+		if(horiLayoutWidth == null)
+			horiLayoutWidth = vertLayoutWidth;
+		
+		if(horiLayoutHeight == null)
+			horiLayoutHeight = vertLayoutHeight;
+		
+		this.horiLayoutWidth = horiLayoutWidth;
+		this.horiLayoutHeight = horiLayoutHeight;
+		
 	}
 
 	public Integer width() {
@@ -33,55 +55,35 @@ public enum ProjectType {
 		return height;
 	}
 		
-	public Integer maxThumbNailWidth() {
-		return maxThumbnailWidth;
-	}
-
-	public Integer maxThumbNailHeight() {
-		return maxThumbnailHeight;
-	}
-	
-	
-	/*
-	public Integer canvasWidth() {
-		if (this.equals(ProjectType.AndroidTab) || this.equals(ProjectType.Ipad)) {
-			canvasWidth = width / 2;
-			return canvasWidth;
+	public Integer layoutWidth(OrientationType orientation) {
+		switch (orientation) {
+			case vertical:
+				return vertLayoutWidth;
+			case horizontal:
+				return horiLayoutWidth;
+			default:
+				return vertLayoutWidth;
 		}
-		
-		return width;
 	}
 
-	public Integer canvasHeight() {
-		if (this.equals(ProjectType.AndroidTab) || this.equals(ProjectType.Ipad)) {
-			canvasHeight = height / 2;
-			return canvasHeight;
+	public Integer layoutHeight(OrientationType orientation) {
+		switch (orientation) {
+			case vertical:
+				return vertLayoutHeight;
+			case horizontal:
+				return horiLayoutHeight;
+			default:
+				return vertLayoutHeight;
 		}
-		
-		return height;
 	}
 	
-
-	public String descriptionText() {
-		switch (this) {
-		case AndroidMobile:
-			return "An android phone with a screen resolution of 480 X 800 px. Samsung galaxy, HTC wildfire, Nexus are some of the popular phones that has this resolution. ";
-		case AndroidTab:
-			return "";
-		case Iphone3G:
-			return "";
-		case Iphone4:
-			return "";
-		case Ipad:
-			return "";
-		case Custom:
-		default:
-			return "";
-
-		}
-
-	}
+//	public Integer maxThumbNailWidth() {
+//		return maxThumbnailWidth;
+//	}
+//
+//	public Integer maxThumbNailHeight() {
+//		return maxThumbnailHeight;
+//	}
 	
-	*/
 
 }

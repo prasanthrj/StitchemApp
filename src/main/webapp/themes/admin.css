@@ -1,0 +1,77 @@
+
+/* tabs */
+
+.tabs-list  {
+	border-bottom: 1px dotted #CCCCCC;
+	margin: 20px 10px 0;
+	padding: 0 10px;
+	overflow: visible;
+}
+
+.tabs-list li {
+	display: inline-block;
+	border: 1px solid #FFFFFF;
+	border-bottom: 1px dotted #CCCCCC;
+	margin: 0 0 -1px;
+    padding: 6px 20px 8px;
+}
+
+.tabs-list li.sel {
+	border: 1px dotted #CCCCCC;
+	border-bottom: 1px solid #FFFFFF;		
+}
+
+.tabs-list li a {
+		
+}
+
+.tabs-list li a:HOVER, .tabs-list li a:FOCUS {
+	text-decoration: none;
+}
+
+
+/* Table */
+
+.admin-table {
+	width: 100%;
+	vertical-align: top;
+}
+
+.admin-table thead {
+	font-size: 13px;
+	color: #333333;
+	text-shadow: 0px 1px 1px #CCCCCC; 
+}
+
+.admin-table tr {
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.admin-table td {
+	padding: 10px 5px;
+	vertical-align: top;
+}
+
+.admin-table img {
+	width: 100px;
+}
+
+.admin-table a {
+	margin: 0 8px;
+}
+
+.admin-table a.thumb {
+    border: 5px solid #333333;
+    border-radius: 3px 3px 3px 3px;
+    display: block;
+    float: left;
+    height: 150px;
+    margin: 3px;
+    overflow: hidden;
+    width: 100px;
+}
+
+.admin-table {
+
+}
+

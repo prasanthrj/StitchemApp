@@ -103,11 +103,18 @@ public class UserAction extends GenericActionSupport implements ApplicationConte
 		if (user == null || user.getEmailId() == null)
 			return ERROR;
 		
-		// TODO reset Password 
-		userService.resetUserCredentials(user.getEmailId());
-		
-		messageBean.setMessageType(MessageType.status);
-		messageBean.setMessage("Password has been sent !!!");
+		user = userService.readUserByEmailId(user.getEmailId());
+		if(user == null)  {
+			messageBean.setMessageType(MessageType.error);
+			
+		} else {
+			// TODO reset Password 
+			userService.resetUserCredentials(user.getEmailId());
+			
+			messageBean.setMessageType(MessageType.status);
+			messageBean.setMessage("Password has been sent !!!");
+			
+		}
 
 		return SUCCESS;
 	}

@@ -89,7 +89,7 @@
 							window.location.href = 'home';
 						}, 2500);
 						
-					} else {
+					} else if(msg.messageType == 'error') {
 						
 					}
 				} 
